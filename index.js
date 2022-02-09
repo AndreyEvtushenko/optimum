@@ -1,4 +1,5 @@
 import express from 'express';
+import {connection} from './models/bd_connect.js';
 
 const expressApp = express();
 const port = 3000;
