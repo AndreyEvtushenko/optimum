@@ -5,6 +5,18 @@
   <title>Main page</title>
 </head>
 <body>
-  
+  <div id="vueFoodWeight">
+    <h1>Specify food & weight</h1>
+    <input type="text" placeholder="food name"
+      @input="showAvailFood"
+      v-model="foodNameInput">
+    <ul v-if="availFood.length > 0">
+      <li v-for="food in availFood">
+        {{ food.food_name }}
+      </li>
+    </ul>
+  </div>
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="food&weight.js"></script>
 </body>
 </html>
