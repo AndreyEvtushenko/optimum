@@ -3,6 +3,7 @@ const rootComponent = {
     return {
       availFood: [],
       foodNameInput: '',
+      noMatches: false,
     }
   },
   methods: {
@@ -16,7 +17,16 @@ const rootComponent = {
     },
 
     async getMatchingFood() {
-
+      if(this.foodNameInput.length >= 2) {
+        const url = `/api/matchingFood/${this.foodNameInput}`;
+        const res = await fetch(url);
+        this.availFood = await res.json();
+        if(this.availFood.length == 0) this.noMatches = true;
+        else this.noMatches = false;
+        console.log(this.availFood);
+        return;
+      }
+      this.availFood = [];
     }
   },
 }

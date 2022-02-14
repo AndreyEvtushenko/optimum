@@ -8,8 +8,9 @@
   <div id="vueFoodWeight">
     <h1>Specify food & weight</h1>
     <input type="text" placeholder="food name"
-      @input="showAvailFood"
+      @input="getMatchingFood"
       v-model="foodNameInput">
+    <p v-if="noMatches">No matches found</p>
     <ul v-if="availFood.length > 0">
       <li v-for="food in availFood">
         {{ food.food_name }}
