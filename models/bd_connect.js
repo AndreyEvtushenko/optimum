@@ -14,7 +14,8 @@ connection.connect( err => {
     return;
   }
 
-  console.log('Connected to the Optimum DB with id:', connection.threadId);
+  console.log('Connected to the Optimum DB with id:', 
+    connection.threadId);
 });
 
 export {connection};

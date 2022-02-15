@@ -7,12 +7,21 @@
 <body>
   <div id="vueFoodWeight">
     <h1>Specify food & weight</h1>
-    <input type="text" placeholder="food name"
+    <input type="text" ref="nameInput"
+      placeholder="food name"
       @input="getMatchingFood"
-      v-model="foodNameInput">
+      v-model="nameInput">
+    <input type="text" ref="weightInput"
+      placeholder="food weight"
+      v-model="weightInput">
+    <p>kcal: {{ nutrients.kcal_weight }}</p>
+    <p>proteins: {{ nutrients.proteins_weight }}</p>
+    <p>fats: {{ nutrients.fats_weight }}</p>
+    <p>carbohydrates: {{ nutrients.carbohydrates_weight }}</p>
     <p v-if="noMatches">No matches found</p>
     <ul v-if="availFood.length > 0">
-      <li v-for="food in availFood">
+      <li v-for="food in availFood"
+        @click="selectThisFood(food)">
         {{ food.food_name }}
       </li>
     </ul>

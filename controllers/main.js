@@ -2,6 +2,7 @@ import path from 'path';
 //import availFood from '../models/testArrFood.js';
 import queryPromise from '../models/getAvailFood.js';
 import queryMatchPromise from '../models/getMatchingFood.js';
+import queryNutrientsPromise from '../models/getNutrients.js';
 
 const appPath = path.resolve();
 
@@ -22,9 +23,15 @@ async function getAvailFood(req, res) {
 }
 
 async function getMatchingFood(req, res) {
-  const substr = req.params.foodNameInput;
+  const substr = req.params.nameInput;
   const matchingFood = await queryMatchPromise(substr);
   res.json(matchingFood);
 }
 
-export { getMainPage, getAvailFood, getMatchingFood };
+async function getNutrients(req, res) {
+  const food_id = req.params.food_id;
+  const nutrients = await queryNutrientsPromise(food_id);
+  res.json(nutrients);
+}
+
+export { getMainPage, getAvailFood, getMatchingFood, getNutrients };
