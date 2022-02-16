@@ -3,14 +3,14 @@ const rootComponent = {
     return {
       availFood: [],
       nameInput: '',
-      noMatches: false,
       selectedFoodId: null,
       weightInput: null,
+      weight: null,
       nutrients: {
-        kcal_weight: null,
-        proteins_weight: null,
-        fats_weight: null,
-        carbohydrates_weight: null,
+        kcal: null,
+        proteins: null,
+        fats: null,
+        carbohydrates: null,
       }
     }
   },
@@ -20,9 +20,33 @@ const rootComponent = {
         this.getNutrients(newValue);
         this.$refs.weightInput.focus();
       }
+    },
+
+    nameInput(newValue, oldValue) {
+      if(newValue === '') {
+        for(let prop in this.nutrients) {
+          this.nutrients[prop] = null;
+        }
+        this.selectedFoodId = null;
+      }
     }
   },
   computed: {
+    noMatches() {
+      if(this.availFood.length == 0 &&
+        this.nameInput.length >= 2 &&
+        !this.selectedFoodId) return true;
+      else return false;
+    },
+
+    nutrientsPerWeight() {
+      const nutrients = {};
+      for(let key in this.nutrients) {
+        nutrients[key] = (this.nutrients[key] *
+          this.weight).toFixed(2);
+      }
+      return nutrients;
+    }
   },
   methods: {
     async showAvailFood() {
@@ -39,8 +63,6 @@ const rootComponent = {
         const url = `/api/matchingFood/${this.nameInput}`;
         const res = await fetch(url);
         this.availFood = await res.json();
-        if(this.availFood.length == 0) this.noMatches = true;
-        else this.noMatches = false;
         return;
       }
       this.availFood = [];
@@ -57,6 +79,17 @@ const rootComponent = {
       const res = await fetch(url);
       const nutrients = await res.json();
       Object.assign(this.nutrients, nutrients);
+    },
+
+    validateWeightInput() {
+      let input = this.weightInput;
+      input = parseFloat(input);
+      if(isNaN(input)) {
+        this.weightInput = null;
+        this.weight = null;
+        return;
+      }
+      this.weight = input;
     }
   },
   mounted() {

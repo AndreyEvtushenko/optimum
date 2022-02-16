@@ -24,10 +24,10 @@ function queryPromise(food_id) {
 function transformResults(results) {
   const nutrients = {};
 
-  nutrients.kcal_weight = results[0].kcal_1;
-  nutrients.proteins_weight = results[0].proteins_1;
-  nutrients.fats_weight = results[0].fats_1;
-  nutrients.carbohydrates_weight = results[0].carbohydrates_1;
+  nutrients.kcal = results[0].kcal_1;
+  nutrients.proteins = results[0].proteins_1;
+  nutrients.fats = results[0].fats_1;
+  nutrients.carbohydrates = results[0].carbohydrates_1;
 
   return nutrients;
 }

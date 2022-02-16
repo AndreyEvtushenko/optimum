@@ -13,11 +13,11 @@
       v-model="nameInput">
     <input type="text" ref="weightInput"
       placeholder="food weight"
+      @input="validateWeightInput"
       v-model="weightInput">
-    <p>kcal: {{ nutrients.kcal_weight }}</p>
-    <p>proteins: {{ nutrients.proteins_weight }}</p>
-    <p>fats: {{ nutrients.fats_weight }}</p>
-    <p>carbohydrates: {{ nutrients.carbohydrates_weight }}</p>
+    <p v-for="(value, key) in nutrientsPerWeight">
+      {{ key }}: {{ value }}
+    </p>
     <p v-if="noMatches">No matches found</p>
     <ul v-if="availFood.length > 0">
       <li v-for="food in availFood"
