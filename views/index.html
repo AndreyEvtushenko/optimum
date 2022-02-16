@@ -9,7 +9,7 @@
     <h1>Specify food & weight</h1>
     <input type="text" ref="nameInput"
       placeholder="food name"
-      @input="getMatchingFood"
+      @input="getMatchingFood(), clearFoodData()"
       v-model="nameInput">
     <input type="text" ref="weightInput"
       placeholder="food weight"

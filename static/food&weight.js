@@ -3,6 +3,7 @@ const rootComponent = {
     return {
       availFood: [],
       nameInput: '',
+      selectedFoodName: '',
       selectedFoodId: null,
       weightInput: null,
       weight: null,
@@ -19,15 +20,6 @@ const rootComponent = {
       if(newValue) {
         this.getNutrients(newValue);
         this.$refs.weightInput.focus();
-      }
-    },
-
-    nameInput(newValue, oldValue) {
-      if(newValue === '') {
-        for(let prop in this.nutrients) {
-          this.nutrients[prop] = null;
-        }
-        this.selectedFoodId = null;
       }
     }
   },
@@ -70,6 +62,7 @@ const rootComponent = {
 
     async selectThisFood(food) {
       this.nameInput = food.food_name;
+      this.selectedFoodName = food.food_name;
       this.selectedFoodId = food.food_id;
       this.availFood = [];
     },
@@ -90,6 +83,17 @@ const rootComponent = {
         return;
       }
       this.weight = input;
+    },
+
+    clearFoodData() {
+      if(this.selectedFoodId &&
+        this.nameInput != this.selectedFoodName) {
+        for(let prop in this.nutrients) {
+          this.nutrients[prop] = null;
+        }
+        this.selectedFoodId = null;
+        this.selectedFoodName = '';
+      }
     }
   },
   mounted() {
