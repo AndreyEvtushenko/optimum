@@ -34,4 +34,10 @@ async function getNutrients(req, res) {
   res.json(nutrients);
 }
 
-export { getMainPage, getAvailFood, getMatchingFood, getNutrients };
+function getFoodOnDate(req, res) {
+  console.log(req.params);
+  res.end();
+}
+
+export { getMainPage, getAvailFood, getMatchingFood, 
+  getNutrients, getFoodOnDate };

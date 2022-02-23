@@ -4,7 +4,7 @@ import mainRouter from './routes/main.js';
 import availFoodRouter from './routes/availFood.js';
 
 const expressApp = express();
-const port = 3000;
+const port = 8080;
 
 expressApp.use(express.json());
 expressApp.use(express.static('static'));
