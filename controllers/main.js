@@ -1,8 +1,5 @@
 import path from 'path';
-//import availFood from '../models/testArrFood.js';
-import queryPromise from '../models/getAvailFood.js';
-import queryMatchPromise from '../models/getMatchingFood.js';
-import queryNutrientsPromise from '../models/getNutrients.js';
+import queries from '../models/queries.js';
 
 const appPath = path.resolve();
 
@@ -17,21 +14,16 @@ function getMainPage(req, res) {
   res.sendFile('/views/index.html', options);
 }
 
-async function getAvailFood(req, res) {
-  const allAvailFood = await queryPromise();
-  res.json(allAvailFood);
-}
-
-async function getMatchingFood(req, res) {
-  const substr = req.params.nameInput;
-  const matchingFood = await queryMatchPromise(substr);
+async function getFoodMatches(req, res) {
+  const substr = req.params.input;
+  const matchingFood = await queries.getFoodMatches(substr);
   res.json(matchingFood);
 }
 
-async function getNutrients(req, res) {
+async function getFoodData(req, res) {
   const food_id = req.params.food_id;
-  const nutrients = await queryNutrientsPromise(food_id);
-  res.json(nutrients);
+  const foodData = await queries.getFoodData(food_id);
+  res.json(foodData[0]);
 }
 
 function getFoodOnDate(req, res) {
@@ -39,5 +31,4 @@ function getFoodOnDate(req, res) {
   res.end();
 }
 
-export { getMainPage, getAvailFood, getMatchingFood, 
-  getNutrients, getFoodOnDate };
+export { getMainPage, getFoodOnDate, getFoodMatches, getFoodData };
