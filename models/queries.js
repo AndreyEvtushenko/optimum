@@ -33,6 +33,12 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  getFoodOnDate(date) {
+    this.values = [date];
+    this.queryText = 'call selectFoodOnDate(?)';
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {

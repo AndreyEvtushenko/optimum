@@ -27,9 +27,12 @@ export default {
     res.json(foodData[0]);
   },
 
-  getFoodOnDate(req, res) {
-    console.log(req.params);
-    res.end();
+  async getFoodOnDate(req, res) {
+    const date = req.params.date;
+    const foodOnDate = await queries.getFoodOnDate(date);
+    //stored procedure returns array with result array and 
+    //object with additional info
+    res.json(foodOnDate[0]);
   },
 
   async postEatenFood(req, res) {

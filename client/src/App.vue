@@ -8,7 +8,7 @@ import DayStat from './components/daystat.vue';
   <div class="datepicker">
     <Datepicker />
   </div>
-  <div class="foodWeight">
+  <div class="provideFoodWeight">
     <FoodWeight />
   </div>
   <div class="dayStat">
@@ -21,8 +21,12 @@ import DayStat from './components/daystat.vue';
     padding: 20px;
     background-color: greenyellow;
   }
-  .foodWeight {
+  .provideFoodWeight {
     padding: 20px;
     background-color: rgb(147, 207, 147);
+  }
+  .dayStat {
+    padding: 20px;
+    background-color: rgb(199, 238, 204);
   }
 </style>

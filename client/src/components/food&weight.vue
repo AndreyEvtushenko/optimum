@@ -94,6 +94,7 @@ function submitSpecifiedFood() {
   store.$patch(obj);
 
   store.sendEatenFood();
+  
   clearFoodData();
   clearInput();
 }

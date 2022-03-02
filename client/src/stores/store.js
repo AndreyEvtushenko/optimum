@@ -19,6 +19,10 @@ export default defineStore('storeId', {
   getters: {
     dayStatId() {
       return this.dayStat.length;
+    },
+
+    pickedDateString() {
+      return this.pickedDate.toDateString();
     }
   },
 
@@ -26,7 +30,7 @@ export default defineStore('storeId', {
     sendEatenFood() {
       //order is important
       const obj = {
-        pickedDate: this.pickedDate.toDateString(),
+        pickedDate: this.pickedDateString,
         dayStatId: this.dayStatId,
         foodId: this.foodId,
         weight: this.weight
