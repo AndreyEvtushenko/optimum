@@ -1,7 +1,7 @@
 <script setup>
 import Datepicker from './components/datepicker.vue';
 import FoodWeight from './components/food&weight.vue';
-
+import DayStat from './components/daystat.vue';
 </script>
 
 <template>
@@ -10,6 +10,9 @@ import FoodWeight from './components/food&weight.vue';
   </div>
   <div class="foodWeight">
     <FoodWeight />
+  </div>
+  <div class="dayStat">
+    <DayStat />
   </div>
 </template>
 

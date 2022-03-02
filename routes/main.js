@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { getMainPage, getFoodOnDate, 
-  getFoodMatches, getFoodData} from '../controllers/main.js';
+import ctrl from '../controllers/main.js';
 
 const router = Router();
 
-router.get('/', getMainPage);
-router.get('/api/date/:pickedDateString', getFoodOnDate);
-router.get('/api/food/matches/:input', getFoodMatches);
-router.get('/api/food/data/:food_id', getFoodData);
+router.get('/', ctrl.getMainPage);
+router.get('/api/date/:pickedDateString', ctrl.getFoodOnDate);
+router.get('/api/food/matches/:input', ctrl.getFoodMatches);
+router.get('/api/food/data/:food_id', ctrl.getFoodData);
+router.post('/api/daystat', ctrl.postEatenFood);
 
 export default router;

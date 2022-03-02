@@ -1,6 +1,9 @@
 <script setup>
-import { ref, onMounted, computed, watch, reactive } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import request from '../libs/requests.js';
+import useStore from '../stores/store.js';
+
+const store = useStore();
 
 const foodNameInputRef = ref(null);
 const weightInputRef = ref(null);
@@ -81,9 +84,28 @@ function selectThisFood(food) {
   validateWeightInput();
 }
 
+function submitSpecifiedFood() {
+  let obj = {
+    foodId: pickedFood.id,
+    name: pickedFood.name,
+    weight: pickedFood.weight,
+  }
+  Object.assign(obj, foodValuePerWeight.value);
+  store.$patch(obj);
+
+  store.sendEatenFood();
+  clearFoodData();
+  clearInput();
+}
+
 async function getPickedFoodData(id) {
   const data = await request.get(`/api/food/data/${id}`);
   Object.assign(pickedFood, data);
+}
+
+function clearInput() {
+  foodNameInput.value = '';
+  weightInput.value = '';
 }
 </script>
 
@@ -101,6 +123,9 @@ async function getPickedFoodData(id) {
   <p v-for="(value, key) in foodValuePerWeight">
     {{ key }}: {{ value }}
   </p>
+  <button @click="submitSpecifiedFood">
+    Submit
+  </button>
   <p v-if="noMatches">No matches found</p>
   <ul v-if="foodMatches.length > 0">
     <li v-for="food in foodMatches"

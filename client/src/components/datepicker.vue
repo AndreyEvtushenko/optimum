@@ -2,24 +2,27 @@
 import { onMounted, ref, computed, watch } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import requests from '../libs/requests.js';
+import useStore from '../stores/store.js';
 
-let pickedDate = ref(new Date());
+//let pickedDate = ref(new Date());
 
-onMounted(() => {
+const store = useStore();
+
+/* onMounted(() => {
   requests.sendDate(pickedDateString.value);
 });
 
-watch(pickedDate, () => {
+watch(store.pickedDate, () => {
   requests.sendDate(pickedDateString.value);
-});
+}); */
 
 const pickedDateString = computed(() => {
-  return pickedDate.value.toDateString();
+  return store.pickedDate.toDateString();
 });
 </script>
 
 <template>
-  <Datepicker v-model="pickedDate"
+  <Datepicker v-model="store.pickedDate"
     input-format="yyyy MMM dd"></Datepicker>
 </template>
 

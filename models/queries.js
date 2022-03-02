@@ -20,6 +20,19 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  insertEatenFood(providedFoodData) {
+    this.values = Object.values(providedFoodData);
+    console.log(this.values);
+    this.queryText = 'INSERT INTO day_stat ' +
+      'SET ' +
+      'date = str_to_date(?, "%W %M %d %Y"), ' +
+      'user_id = 1, ' + 
+      'day_stat_id = ?, ' +
+      'food_id = ?, ' +
+      'weight = ?';
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {
