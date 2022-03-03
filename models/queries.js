@@ -35,7 +35,15 @@ export default {
 
   getFoodOnDate(date) {
     this.values = [date];
-    this.queryText = 'call selectFoodOnDate(?)';
+    this.queryText = 'call select_food_on_date(?)';
+    return new Promise(this.executor.bind(this));
+  },
+
+  delEatenFood(date, day_stat_id) {
+    this.values = [date, day_stat_id];
+    this.queryText = 'DELETE FROM day_stat ' +
+      'WHERE date = str_to_date(?, "%W %M %d %Y") AND ' +
+      'day_stat_id = ?';
     return new Promise(this.executor.bind(this));
   },
 

@@ -18,7 +18,9 @@ export default defineStore('storeId', {
   
   getters: {
     dayStatId() {
-      return this.dayStat.length;
+      const length = this.dayStat.length;
+      const lastDayStatId = this.dayStat[length - 1].day_stat_id;
+      return lastDayStatId + 1;
     },
 
     pickedDateString() {
@@ -41,6 +43,7 @@ export default defineStore('storeId', {
 
     addFoodToDayStat() {
       this.dayStat.push({
+        day_stat_id: this.dayStatId,
         name: this.name,
         weight: this.weight,
         kcal: this.kcal,
@@ -48,6 +51,12 @@ export default defineStore('storeId', {
         fats: this.fats,
         carbohydrates: this.carbohydrates
       });
+    },
+
+    delFoodFromDayStat(dayStatId) {
+      this.dayStat = this.dayStat.filter(
+        food => food.day_stat_id != dayStatId
+      );
     }
   }
 });

@@ -25,5 +25,14 @@ export default {
   async get(relURL) {
     const res = await fetch(this.baseURL + relURL);
     return res.json();
+  },
+
+  async delete(relURL) {
+    const res = await fetch(this.baseURL + relURL, {
+      method: 'DELETE'
+    });
+    if(!res.ok) {
+      console.log('HTTP-Error:', res.status);
+    }
   }
 }

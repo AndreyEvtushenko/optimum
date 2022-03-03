@@ -39,5 +39,12 @@ export default {
     const eatenFood = req.body;
     await queries.insertEatenFood(eatenFood);
     res.end();
+  },
+
+  async delEatenFood(req, res) {
+    const date = req.params.date;
+    const day_stat_id = req.params.day_stat_id;
+    await queries.delEatenFood(date, day_stat_id);
+    res.end();
   }
 }
