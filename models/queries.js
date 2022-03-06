@@ -35,7 +35,7 @@ export default {
 
   getFoodOnDate(date) {
     this.values = [date];
-    this.queryText = 'call select_food_on_date(?)';
+    this.queryText = 'CALL select_food_on_date(?)';
     return new Promise(this.executor.bind(this));
   },
 
@@ -44,6 +44,40 @@ export default {
     this.queryText = 'DELETE FROM day_stat ' +
       'WHERE date = str_to_date(?, "%W %M %d %Y") AND ' +
       'day_stat_id = ?';
+    return new Promise(this.executor.bind(this));
+  },
+
+  getDayTotalStat(date) {
+    this.values = [date];
+    this.queryText = 'CALL select_day_total_stat(?)';
+    return new Promise(this.executor.bind(this));
+  },
+
+  insertDayTotalStat(stat, date) {
+    this.values = [date];
+    this.values.push(...Object.values(stat));
+    this.queryText = 'INSERT INTO total ' +
+      'SET ' +
+      'date = str_to_date(?, "%W %M %d %Y"), ' +
+      'user_id = 1, ' + 
+      'kcal_total = ?, ' +
+      'proteins_total = ?, ' +
+      'fats_total = ?, ' +
+      'carbohydrates_total = ?';
+    return new Promise(this.executor.bind(this));
+  },
+
+  updateDayTotalStat(stat, date) {
+    this.values = Object.values(stat);
+    this.values.push(date);
+    this.queryText = 'UPDATE total ' +
+      'SET ' +
+      'user_id = 1, ' + 
+      'kcal_total = ?, ' +
+      'proteins_total = ?, ' +
+      'fats_total = ?, ' +
+      'carbohydrates_total = ? ' +
+      'WHERE date = str_to_date(?, "%W %M %d %Y")';
     return new Promise(this.executor.bind(this));
   },
 

@@ -12,20 +12,23 @@ export default defineStore('storeId', {
       proteins: null,
       fats: null,
       carbohydrates: null,
-      dayStat: []
+      dayStat: [],
     }
   },
   
   getters: {
     dayStatId() {
       const length = this.dayStat.length;
-      const lastDayStatId = this.dayStat[length - 1].day_stat_id;
-      return lastDayStatId + 1;
+      if(length) {
+        const lastDayStatId = this.dayStat[length - 1].day_stat_id;
+        return lastDayStatId + 1;
+      }
+      return 0;
     },
 
     pickedDateString() {
       return this.pickedDate.toDateString();
-    }
+    },
   },
 
   actions: {
@@ -57,6 +60,6 @@ export default defineStore('storeId', {
       this.dayStat = this.dayStat.filter(
         food => food.day_stat_id != dayStatId
       );
-    }
+    },
   }
 });

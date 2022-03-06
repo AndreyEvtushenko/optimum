@@ -11,9 +11,11 @@ onMounted(() => {
 });
 
 watch(
-  () => store.pickedDate, 
-  () => {
-    getFoodOnDate();
+  () => store.pickedDateString, 
+  (newDate, oldDate) => {
+    if(newDate != oldDate) {
+      getFoodOnDate();
+    }
   }
 );
 

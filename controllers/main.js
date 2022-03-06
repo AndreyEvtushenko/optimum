@@ -46,5 +46,27 @@ export default {
     const day_stat_id = req.params.day_stat_id;
     await queries.delEatenFood(date, day_stat_id);
     res.end();
+  },
+
+  async getDayTotalStat(req, res) {
+    const date = req.params.date;
+    const dayTotalStat = await queries.getDayTotalStat(date);
+    //stored procedure returns array with result array and 
+    //object with additional info
+    res.json(dayTotalStat[0]); 
+  },
+
+  async postDayTotalStat(req, res) {
+    const dayTotalStat = req.body;
+    const date = req.params.date;
+    await queries.insertDayTotalStat(dayTotalStat, date);
+    res.end();
+  },
+
+  async patchDayTotalStat(req, res) {
+    const dayTotalStat = req.body;
+    const date = req.params.date;
+    await queries.updateDayTotalStat(dayTotalStat, date);
+    res.end();
   }
 }

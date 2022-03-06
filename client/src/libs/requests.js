@@ -1,22 +1,27 @@
 export default {
   baseURL: 'http://localhost:8080',
-
-  async sendDate(pickedDateString) {
-    const res = await fetch(this.baseURL + 
-      `/api/date/${pickedDateString}`);
-    if(!res.ok) {
-      console.log('HTTP-Error:', res.status);
-    }
+  options: {
+    method: '',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: ''
   },
 
-  async post(relURL, data) {
-    const res = await fetch(this.baseURL + relURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data),
-    });
+  post(relURL, data) {
+    this.options.method = 'POST';
+    this.options.body = JSON.stringify(data);
+    this.send(relURL);
+  },
+
+  patch(relURL, data) {
+    this.options.method = 'PATCH';
+    this.options.body = JSON.stringify(data);
+    this.send(relURL);
+  },
+
+  async send(relURL) {
+    const res = await fetch(this.baseURL + relURL, this.options);
     if(!res.ok) {
       console.log('HTTP-Error:', res.status);
     }

@@ -31,13 +31,13 @@ const noMatches = computed(() => {
 
 const foodValuePerWeight = computed(() => {
   return {
-    kcal: (pickedFood.kcal_1 * pickedFood.weight)
+    kcal: +(pickedFood.kcal_1 * pickedFood.weight)
       .toFixed(2),
-    proteins: (pickedFood.proteins_1 * pickedFood.weight)
+    proteins: +(pickedFood.proteins_1 * pickedFood.weight)
       .toFixed(2),
-    fats: (pickedFood.fats_1 * pickedFood.weight)
+    fats: +(pickedFood.fats_1 * pickedFood.weight)
       .toFixed(2),
-    carbohydrates: (pickedFood.carbohydrates_1 * pickedFood.weight)
+    carbohydrates: +(pickedFood.carbohydrates_1 * pickedFood.weight)
       .toFixed(2),
   }
 });
