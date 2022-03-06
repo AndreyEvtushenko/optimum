@@ -22,7 +22,6 @@ export default {
 
   insertEatenFood(providedFoodData) {
     this.values = Object.values(providedFoodData);
-    console.log(this.values);
     this.queryText = 'INSERT INTO day_stat ' +
       'SET ' +
       'date = str_to_date(?, "%W %M %d %Y"), ' +

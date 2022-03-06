@@ -11,7 +11,7 @@ const dayTotalStat = reactive({
   carbohydrates: 0
 });
 //used for total stat recalculation optimization
-let dateChangedFlag = false;
+let dateChangedFlag = true;
 
 watch(
   () => store.dayStat.length,
@@ -26,6 +26,7 @@ watch(
 watch(
   () => store.pickedDateString,
   (newDate, oldDate) => {
+    clearTotalDayStat();
     if(newDate != oldDate)
       dateChangedFlag = true;
   }
@@ -35,8 +36,9 @@ watch(
   () => store.dayStat, async () => {
     if(dateChangedFlag && store.dayStat.length) {
       const gotTotalStat = await getDayTotalStat();
-      if(!gotTotalStat) {
+      if(!gotTotalStat) { 
         calcTotalStat();
+        console.log('send', dayTotalStat)
         sendDayTotalStat('post');
       }
       dateChangedFlag = false;
@@ -57,8 +59,6 @@ async function getDayTotalStat() {
 
 function sendDayTotalStat(method) {
   const date = store.pickedDateString;
-  /* const obj = { date };
-  Object.assign(obj, dayTotalStat); */
   if(method == 'post')
     request.post(`/api/totalstat/${date}`, dayTotalStat);
   else
@@ -75,8 +75,7 @@ function delEatenFood(food) {
   sendDayTotalStat('patch');
 }
 
-function calcTotalStat() {
-  clearTotalDayStat();  
+function calcTotalStat() { 
   store.dayStat.forEach((food) => {
     for(let key in dayTotalStat) {
       dayTotalStat[key] += food[key];
@@ -119,39 +118,44 @@ function subFromTotalStat(deletedFood) {
   <p v-if="!store.dayStat.length">
     No eaten food on this date
   </p>
-  <div class="foodOnDate" 
-    v-for="food in store.dayStat">
-    <span class="firstColumn">{{ food.name }}</span>
-    <span>{{ food.weight }}</span>
-    <span>{{ food.kcal }}</span>
-    <span>{{ food.proteins }}</span>
-    <span>{{ food.fats }}</span>
-    <span>{{ food.carbohydrates }}</span>
-    <button @click="delEatenFood(food)">Delete</button>
-  </div>
   <div v-if="store.dayStat.length">
-    <hr>
-    <span class="total">Total:</span>
-    <span class="value" v-for="value in dayTotalStat">
-      {{ value }}
-    </span>
-  </div>
+    <div class="foodOnDate">
+      <span class="firstColumn"></span>
+      <span>Weight</span>
+      <span>Kcal</span>
+      <span>Prots.</span>
+      <span>Fats</span>
+      <span>Carbs.</span>
+    </div>
+    <div class="foodOnDate"
+      v-for="food in store.dayStat">
+      <span class="firstColumn">{{ food.name }}</span>
+      <span>{{ food.weight }}</span>
+      <span>{{ food.kcal }}</span>
+      <span>{{ food.proteins }}</span>
+      <span>{{ food.fats }}</span>
+      <span>{{ food.carbohydrates }}</span>
+      <button @click="delEatenFood(food)">Delete</button>
+    </div>
+    <div class="totalStat">
+      <hr>
+      <span class="header">Total:</span>
+      <span class="value" v-for="value in dayTotalStat">
+        {{ value }}
+      </span>
+    </div>
+  </div>  
 </template>
 
 <style>
-  .foodOnDate span {
+  .foodOnDate span, .totalStat span {
     display: inline-block;
     width: 60px;
   }
   .foodOnDate .firstColumn {
     width: 400px;
   }
-  span.total {
-    display: inline-block;
+  .totalStat .header {
     width: 460px;
-  }
-  span.value {
-    display: inline-block;
-    width: 60px;
   }
 </style>
