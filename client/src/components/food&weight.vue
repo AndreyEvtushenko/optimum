@@ -85,23 +85,39 @@ function selectThisFood(food) {
 }
 
 function submitSpecifiedFood() {
-  let obj = {
-    foodId: pickedFood.id,
-    name: pickedFood.name,
-    weight: pickedFood.weight,
-  }
-  Object.assign(obj, foodValuePerWeight.value);
-  store.$patch(obj);
-
-  store.sendEatenFood();
+  sendEatenFood();
+  addFoodToDayStat();
   
   clearFoodData();
   clearInput();
+
+  foodNameInputRef.value.focus();
 }
 
 async function getPickedFoodData(id) {
   const data = await request.get(`/api/food/data/${id}`);
   Object.assign(pickedFood, data);
+}
+
+function sendEatenFood() {
+  const eatenFood = {
+    date: store.pickedDateString,
+    dayStatId: store.getDayStatId,
+    foodId: pickedFood.id,
+    weight: pickedFood.weight
+  }
+  request.post('/api/daystat', eatenFood);
+}
+
+function addFoodToDayStat() {
+  const dayStatFoodItem = {
+    dayStatId: store.getDayStatId,
+    name: pickedFood.name,
+    weight: pickedFood.weight,
+  }
+  Object.assign(dayStatFoodItem, foodValuePerWeight.value);
+  store.dayStat.push(dayStatFoodItem);
+  store.foodAddedFlag = true;
 }
 
 function clearInput() {

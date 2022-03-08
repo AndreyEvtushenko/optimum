@@ -10,17 +10,18 @@ const dayTotalStat = reactive({
   fats: 0,
   carbohydrates: 0
 });
+let foodDeletedFlag = false;
 
 watch(
   () => store.foodAddedFlag,
   (newValue) => {
     if(!newValue) return;
-    console.log('adding')
+    const date = store.pickedDateString;
     addToTotalStat();
     if(store.dayStat.length == 1)
-      sendDayTotalStat('post');
+      request.post(`/api/totalstat/${date}`, dayTotalStat);
     else
-      sendDayTotalStat('patch');
+      request.patch(`/api/totalstat/${date}`, dayTotalStat);
     store.foodAddedFlag = false;
   }
 );
@@ -36,13 +37,10 @@ watch(
 
 watch(
   () => store.dayStat, async () => {
-    console.log('dayStat changed')
-    if(store.dayStat.length && !store.foodDeletedFlag) {
-      console.log('working')
-      const gotTotalStat = await getDayTotalStat();
-      console.log(gotTotalStat)
+    if(store.dayStat.length && !foodDeletedFlag) {
+      await getDayTotalStat();
     } else
-      store.foodDeletedFlag = false;
+      foodDeletedFlag = false;
   }
 );
 
@@ -57,26 +55,24 @@ async function getDayTotalStat() {
   else return false;
 }
 
-function sendDayTotalStat(method) {
-  const date = store.pickedDateString;
-  if(method == 'post')
-    request.post(`/api/totalstat/${date}`, dayTotalStat);
-  else
-    request.patch(`/api/totalstat/${date}`, dayTotalStat);
-}
-
 function delEatenFood(food) {
-  console.log('deleting')
   const date = store.pickedDateString;
-  const dayStatId = food.day_stat_id;
+  const dayStatId = food.dayStatId;
   const URL = `/api/daystat/${date}/${dayStatId}`;
   request.delete(URL);
-  store.delFoodFromDayStat(dayStatId);
+  delFromDayStat(dayStatId);
   subFromTotalStat(food);
   if(store.dayStat.length)
-    sendDayTotalStat('patch');
+    request.patch(`/api/totalstat/${date}`, dayTotalStat);
   else
     request.delete(`/api/totalstat/${date}`);
+}
+
+function delFromDayStat(dayStatId) {
+  store.dayStat = store.dayStat.filter(
+    food => food.dayStatId != dayStatId
+  );
+  foodDeletedFlag = true;
 }
 
 function clearTotalDayStat() {
@@ -97,7 +93,6 @@ function addToTotalStat() {
     dayTotalStat[key] += lastFood[key];
   }
   roundTotalStat();
-
 }
 
 function subFromTotalStat(deletedFood) {
