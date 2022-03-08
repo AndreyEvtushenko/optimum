@@ -12,5 +12,6 @@ router.delete('/api/daystat/:date/:day_stat_id', ctrl.delEatenFood);
 router.get('/api/totalstat/:date', ctrl.getDayTotalStat);
 router.post('/api/totalstat/:date', ctrl.postDayTotalStat);
 router.patch('/api/totalstat/:date', ctrl.patchDayTotalStat);
+router.delete('/api/totalstat/:date', ctrl.delDayTotalStat);
 
 export default router;

@@ -80,6 +80,13 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  delDayTotalStat(date) {
+    this.values = [date];
+    this.queryText = 'DELETE FROM total ' +
+      'WHERE date = str_to_date(?, "%W %M %d %Y")';
+    return new Promise(this.executor.bind(this));    
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {

@@ -10,39 +10,39 @@ const dayTotalStat = reactive({
   fats: 0,
   carbohydrates: 0
 });
-//used for total stat recalculation optimization
-let dateChangedFlag = true;
 
 watch(
-  () => store.dayStat.length,
-  (newValue, oldValue) => {
-    if(newValue - oldValue == 1) {
-      addToTotalStat();
+  () => store.foodAddedFlag,
+  (newValue) => {
+    if(!newValue) return;
+    console.log('adding')
+    addToTotalStat();
+    if(store.dayStat.length == 1)
+      sendDayTotalStat('post');
+    else
       sendDayTotalStat('patch');
-    }   
+    store.foodAddedFlag = false;
   }
 );
-//used for total stat recalculation optimization
+
 watch(
   () => store.pickedDateString,
   (newDate, oldDate) => {
-    clearTotalDayStat();
-    if(newDate != oldDate)
-      dateChangedFlag = true;
+    if(newDate != oldDate) {
+      clearTotalDayStat();
+    }      
   }
 );
 
 watch(
   () => store.dayStat, async () => {
-    if(dateChangedFlag && store.dayStat.length) {
+    console.log('dayStat changed')
+    if(store.dayStat.length && !store.foodDeletedFlag) {
+      console.log('working')
       const gotTotalStat = await getDayTotalStat();
-      if(!gotTotalStat) { 
-        calcTotalStat();
-        console.log('send', dayTotalStat)
-        sendDayTotalStat('post');
-      }
-      dateChangedFlag = false;
-    }
+      console.log(gotTotalStat)
+    } else
+      store.foodDeletedFlag = false;
   }
 );
 
@@ -66,22 +66,17 @@ function sendDayTotalStat(method) {
 }
 
 function delEatenFood(food) {
+  console.log('deleting')
   const date = store.pickedDateString;
   const dayStatId = food.day_stat_id;
   const URL = `/api/daystat/${date}/${dayStatId}`;
   request.delete(URL);
   store.delFoodFromDayStat(dayStatId);
   subFromTotalStat(food);
-  sendDayTotalStat('patch');
-}
-
-function calcTotalStat() { 
-  store.dayStat.forEach((food) => {
-    for(let key in dayTotalStat) {
-      dayTotalStat[key] += food[key];
-    }
-  });
-  roundTotalStat();
+  if(store.dayStat.length)
+    sendDayTotalStat('patch');
+  else
+    request.delete(`/api/totalstat/${date}`);
 }
 
 function clearTotalDayStat() {

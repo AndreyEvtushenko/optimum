@@ -20,8 +20,10 @@ watch(
 );
 
 async function getFoodOnDate() {
-  const url = `/api/daystat/${store.pickedDateString}`;
-  store.dayStat = await request.get(url);
+  const date = store.pickedDateString;
+  const url = `/api/daystat/${date}`;
+  const retrievedDayStat = await request.get(url);
+  store.dayStat = retrievedDayStat;
 }
 </script>
 

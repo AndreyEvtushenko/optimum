@@ -68,5 +68,11 @@ export default {
     const date = req.params.date;
     await queries.updateDayTotalStat(dayTotalStat, date);
     res.end();
+  },
+
+  async delDayTotalStat(req, res) {
+    const date = req.params.date;
+    await queries.delDayTotalStat(date);
+    res.end();
   }
 }

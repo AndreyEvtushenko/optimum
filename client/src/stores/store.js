@@ -13,6 +13,9 @@ export default defineStore('storeId', {
       fats: null,
       carbohydrates: null,
       dayStat: [],
+      //used for total stat calculations
+      foodAddedFlag: false,
+      foodDeletedFlag: false
     }
   },
   
@@ -54,12 +57,14 @@ export default defineStore('storeId', {
         fats: this.fats,
         carbohydrates: this.carbohydrates
       });
+      this.foodAddedFlag = true;
     },
 
     delFoodFromDayStat(dayStatId) {
       this.dayStat = this.dayStat.filter(
         food => food.day_stat_id != dayStatId
       );
+      this.foodDeletedFlag = true;
     },
   }
 });
