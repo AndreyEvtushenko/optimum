@@ -1,32 +1,24 @@
 <script setup>
-import Datepicker from './components/datepicker.vue';
-import FoodWeight from './components/food&weight.vue';
-import DayStat from './components/daystat.vue';
+//import Main from './components/main.vue';
 </script>
 
 <template>
-  <div class="datepicker">
-    <Datepicker />
-  </div>
-  <div class="provideFoodWeight">
-    <FoodWeight />
-  </div>
-  <div class="dayStat">
-    <DayStat />
-  </div>
+  <nav>
+    <router-link to="/">Main</router-link>
+    <router-link to="/addproduct">Add Product</router-link>
+  </nav>
+  <router-view></router-view>
 </template>
 
 <style>
-  .datepicker {
+  nav {
+    background-color: rgb(218, 248, 218);
     padding: 20px;
-    background-color: greenyellow;
   }
-  .provideFoodWeight {
+  a {
     padding: 20px;
-    background-color: rgb(147, 207, 147);
   }
-  .dayStat {
-    padding: 20px;
-    background-color: rgb(199, 238, 204);
+  a:hover {
+    background-color: rgb(168, 231, 160);
   }
 </style>
