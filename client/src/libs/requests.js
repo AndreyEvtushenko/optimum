@@ -8,10 +8,10 @@ export default {
     body: ''
   },
 
-  post(relURL, data) {
+  async post(relURL, data) {
     this.options.method = 'POST';
     this.options.body = JSON.stringify(data);
-    this.send(relURL);
+    return await this.send(relURL);
   },
 
   patch(relURL, data) {
@@ -25,6 +25,7 @@ export default {
     if(!res.ok) {
       console.log('HTTP-Error:', res.status);
     }
+    return res.ok;    
   },
 
   async get(relURL) {

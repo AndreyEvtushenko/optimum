@@ -1,13 +1,11 @@
 <script setup>
-import { ref, onMounted, computed, reactive } from 'vue';
+import { ref, onMounted, computed, reactive, watch } from 'vue';
 import request from '../libs/requests.js';
-import useStore from '../stores/store.js';
 
-const store = useStore();
 const productNameInputRef = ref(null);
 const productNameInput = ref('');
-//const kcalInput = ref('');
-
+const productAddedFlag = ref(false);
+const notEnoughInfoFlag = ref(false);
 const energyValueInputs = reactive({
   kcal: '',
   proteins: '',
@@ -18,6 +16,26 @@ const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
 
 onMounted(() => {
   productNameInputRef.value.focus();
+});
+
+watch(productAddedFlag, (newValue) => {
+  if(newValue)
+    setTimeout(() => productAddedFlag.value = false, 2000);
+});
+
+watch(notEnoughInfoFlag, (newValue) => {
+  if(newValue)
+    setTimeout(() => notEnoughInfoFlag.value = false, 2000);
+});
+
+const product = computed(() => {
+  const obj = {
+    name: productNameInput.value,
+  }
+  for(let key in energyValueInputs) {
+    obj[key + '_1'] = energyValueInputs[key] / 100;
+  }
+  return obj;
 });
 
 function validateInput(key, prevInput) {
@@ -104,8 +122,27 @@ function processMaxValue(key, input) {
     return input;
 }
 
-function show() {
-  console.log();
+async function submitProduct() {
+  if(!providedInfoIsEnought())
+    return;
+  const URL = '/api/product';
+  productAddedFlag.value = await request.post(URL, product.value);
+  clearInput();
+}
+
+function providedInfoIsEnought() {
+  if(productNameInput.value == '' || 
+    product.value.kcal_1 == 0) {
+      notEnoughInfoFlag.value = true;
+      return false;
+    }
+  return true;
+}
+
+function clearInput() {
+  productNameInput.value = '';
+  for(let key in energyValueInputs)
+    energyValueInputs[key] = '';
 }
 </script>
 
@@ -122,6 +159,16 @@ function show() {
       @input="validateInput(key, value)"
       v-model="energyValueInputs[key]">
   </div>
+  <button @click="submitProduct">
+    Submit
+  </button>
+  <p v-if="productAddedFlag">
+    Product was added
+  </p>
+  <p v-if="notEnoughInfoFlag">
+    Not enough information provided
+  </p>
+  <hr>
 </template>
 
 <style>

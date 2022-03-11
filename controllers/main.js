@@ -74,5 +74,11 @@ export default {
     const date = req.params.date;
     await queries.delDayTotalStat(date);
     res.end();
-  }
+  },
+
+  async postProduct(req, res) {
+    const product = req.body;
+    await queries.insertProduct(product);
+    res.end();
+  } 
 }

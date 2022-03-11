@@ -13,5 +13,6 @@ router.get('/api/totalstat/:date', ctrl.getDayTotalStat);
 router.post('/api/totalstat/:date', ctrl.postDayTotalStat);
 router.patch('/api/totalstat/:date', ctrl.patchDayTotalStat);
 router.delete('/api/totalstat/:date', ctrl.delDayTotalStat);
+router.post('/api/product', ctrl.postProduct);
 
 export default router;

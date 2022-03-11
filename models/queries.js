@@ -87,6 +87,19 @@ export default {
     return new Promise(this.executor.bind(this));    
   },
 
+  insertProduct(product) {
+    this.values = Object.values(product);
+    this.queryText = 'INSERT INTO food ' +
+      'SET ' +
+      'food_name = ?, ' +
+      'is_dish = 0, ' +
+      'kcal_1 = ?, ' +
+      'proteins_1 = ?, ' +
+      'fats_1 = ?, ' +
+      'carbohydrates_1 = ?'
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {
