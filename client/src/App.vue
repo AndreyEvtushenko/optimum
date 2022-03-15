@@ -8,6 +8,7 @@
     <router-link to="/addproduct">Add Product</router-link>
   </nav>
   <router-view></router-view>
+  <router-view name="ProductList"></router-view>
 </template>
 
 <style>

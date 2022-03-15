@@ -80,5 +80,10 @@ export default {
     const product = req.body;
     await queries.insertProduct(product);
     res.end();
-  } 
+  },
+
+  async getProducts(req, res) {
+    const products = await queries.getProducts();
+    res.json(products);
+  }
 }

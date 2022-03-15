@@ -123,14 +123,14 @@ function processMaxValue(key, input) {
 }
 
 async function submitProduct() {
-  if(!providedInfoIsEnought())
+  if(!providedInfoIsEnough())
     return;
   const URL = '/api/product';
   productAddedFlag.value = await request.post(URL, product.value);
   clearInput();
 }
 
-function providedInfoIsEnought() {
+function providedInfoIsEnough() {
   if(productNameInput.value == '' || 
     product.value.kcal_1 == 0) {
       notEnoughInfoFlag.value = true;

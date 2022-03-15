@@ -14,7 +14,8 @@ export default {
 
   getFoodData(food_id) {
     this.values = [food_id];
-    this.queryText = 'SELECT kcal_1, proteins_1, fats_1, carbohydrates_1 ' +
+    this.queryText = 'SELECT ' +
+      'kcal_1, proteins_1, fats_1, carbohydrates_1 ' +
       'FROM food ' + 
       'WHERE food_id = ?';
     return new Promise(this.executor.bind(this));
@@ -97,6 +98,15 @@ export default {
       'proteins_1 = ?, ' +
       'fats_1 = ?, ' +
       'carbohydrates_1 = ?'
+    return new Promise(this.executor.bind(this));
+  },
+
+  getProducts() {
+    this.queryText = 'SELECT ' +
+      'food_id AS id, food_name AS name, kcal_1, ' +
+      'proteins_1, fats_1, carbohydrates_1 ' +
+      'FROM food ' +
+      'WHERE is_dish = 0';
     return new Promise(this.executor.bind(this));
   },
 
