@@ -85,5 +85,12 @@ export default {
   async getProducts(req, res) {
     const products = await queries.getProducts();
     res.json(products);
+  },
+
+  async patchProduct(req, res) {
+    const productId = req.params.id;
+    const newProductValues = req.body;
+    await queries.updateProduct(newProductValues, productId);
+    res.end();
   }
 }

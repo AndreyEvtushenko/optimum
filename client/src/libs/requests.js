@@ -14,10 +14,10 @@ export default {
     return await this.send(relURL);
   },
 
-  patch(relURL, data) {
+  async patch(relURL, data) {
     this.options.method = 'PATCH';
     this.options.body = JSON.stringify(data);
-    this.send(relURL);
+    return await this.send(relURL);
   },
 
   async send(relURL) {
@@ -25,7 +25,7 @@ export default {
     if(!res.ok) {
       console.log('HTTP-Error:', res.status);
     }
-    return res.ok;    
+    return res.ok;
   },
 
   async get(relURL) {

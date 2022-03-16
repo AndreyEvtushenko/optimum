@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Main from './components/main.vue';
-import AddProduct from './components/addproduct.vue';
+import ProductForm from './components/productform.vue';
 import ProductList from './components/productlist.vue';
 
 export default createRouter({
@@ -11,9 +11,9 @@ export default createRouter({
       component: Main
     },
     {
-      path: '/addproduct',
+      path: '/products',
       components: {
-        default: AddProduct,
+        default: ProductForm,
         ProductList
       }
     }

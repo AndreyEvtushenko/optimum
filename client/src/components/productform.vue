@@ -1,49 +1,70 @@
 <script setup>
 import { ref, onMounted, computed, reactive, watch } from 'vue';
+import useStore from '../stores/products.js';
 import request from '../libs/requests.js';
+
+const store = useStore();
 
 const productNameInputRef = ref(null);
 const productNameInput = ref('');
-const productAddedFlag = ref(false);
-const notEnoughInfoFlag = ref(false);
-const energyValueInputs = reactive({
+const nutrValueInputs = reactive({
   kcal: '',
   proteins: '',
   fats: '',
   carbohydrates: ''
 });
+let productChanges = {};
 const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
+const submitButtonText = ref('Submit');
+const clearButtonText = ref('Clean');
+const resultMessage = ref('');
 
 onMounted(() => {
   productNameInputRef.value.focus();
 });
 
-watch(productAddedFlag, (newValue) => {
+watch(() => resultMessage.value, 
+  (newValue) => {
   if(newValue)
-    setTimeout(() => productAddedFlag.value = false, 2000);
+    setTimeout(() => resultMessage.value = '', 2000);
 });
 
-watch(notEnoughInfoFlag, (newValue) => {
-  if(newValue)
-    setTimeout(() => notEnoughInfoFlag.value = false, 2000);
+watch(
+  () => store.editProductFlag,
+  (newValue) => {
+    if(!newValue) {
+      submitButtonText.value = 'Submit';
+      clearButtonText.value = 'Clean';
+      return;
+    }
+    fillInputsForEdit();
+    submitButtonText.value = 'Save changes';
+    clearButtonText.value = 'Cancel';
 });
 
 const product = computed(() => {
   const obj = {
     name: productNameInput.value,
   }
-  for(let key in energyValueInputs) {
-    obj[key + '_1'] = energyValueInputs[key] / 100;
+  for(let key in nutrValueInputs) {
+    obj[key + '_1'] = nutrValueInputs[key] / 100;
   }
   return obj;
 });
 
+function fillInputsForEdit() {
+  productNameInput.value = store.editableProduct.name;
+  for(let key in nutrValueInputs) {
+    nutrValueInputs[key] = store.editableProduct[key];
+  }
+}
+
 function validateInput(key, prevInput) {
-  let input = energyValueInputs[key];
+  let input = nutrValueInputs[key];
   input = processInputLength(key, input, prevInput);
 
   if(isNaN(parseFloat(input))) {
-    energyValueInputs[key] = '';
+    nutrValueInputs[key] = '';
     return;
   }
   //case 123..
@@ -57,7 +78,7 @@ function validateInput(key, prevInput) {
   }
 
   input = processMaxValue(key, input);
-  energyValueInputs[key] = input;
+  nutrValueInputs[key] = input;
 }
 
 function processInputLength(key, input, prevInput) {
@@ -125,24 +146,96 @@ function processMaxValue(key, input) {
 async function submitProduct() {
   if(!providedInfoIsEnough())
     return;
-  const URL = '/api/product';
-  productAddedFlag.value = await request.post(URL, product.value);
-  clearInput();
+  if(store.editProductFlag) {
+    editProduct();
+  } else {
+    addProduct();
+  }  
 }
 
 function providedInfoIsEnough() {
   if(productNameInput.value == '' || 
     product.value.kcal_1 == 0) {
-      notEnoughInfoFlag.value = true;
+      resultMessage.value = 'Not enough information provided';
       return false;
     }
   return true;
 }
 
+async function editProduct() {
+  //productChanges is filled here
+  if(!detectProductChanges()) {
+    resultMessage.value = 'No changes were made';
+    return;
+  }
+  const success = await sendEditedProduct();
+  if(success) {
+    resultMessage.value = 'Changes saved';
+    updateProductList();
+    cleanEdit();
+    clearInput();
+  } else {
+    resultMessage.value = 'Changes weren\'t saved';
+  }
+}
+
+function detectProductChanges() {
+  let anyChanges = false;
+  if(productNameInput.value != store.editableProduct.name) {
+    anyChanges = true;
+    productChanges.name = productNameInput.value;
+  }
+  for(let key in nutrValueInputs) {
+    if(nutrValueInputs[key] != store.editableProduct[key]) {
+      anyChanges = true;
+      productChanges[key] = nutrValueInputs[key].toFixed(2);
+    }    
+  }
+  return anyChanges;
+}
+
+function sendEditedProduct() {
+  const id = store.editableProduct.id;
+  const URL = `/api/product/${id}`;
+  return request.patch(URL, product.value);
+}
+
+function updateProductList() {
+  Object.assign(store.editableProduct, productChanges);
+}
+
+function cleanEdit() {
+  productChanges = {};
+  store.editableProduct = {};
+  store.editProductFlag = false;
+}
+
 function clearInput() {
   productNameInput.value = '';
-  for(let key in energyValueInputs)
-    energyValueInputs[key] = '';
+  for(let key in nutrValueInputs)
+    nutrValueInputs[key] = '';
+}
+
+async function addProduct() {
+  const success = await sendNewProduct();
+  if(success) {
+    resultMessage.value = 'Product was added';
+    clearInput();
+  } else {
+    resultMessage.value = 'Product wasn\'t added';
+  }
+}
+
+function sendNewProduct() {
+  const URL = '/api/product';
+  return request.post(URL, product.value);
+}
+
+function cancelOperation() {
+  if(store.editProductFlag) {
+    cleanEdit();
+  }
+  clearInput();
 }
 </script>
 
@@ -153,20 +246,20 @@ function clearInput() {
     v-model="productNameInput"
     @input="process">
   <div class="energy-value-input"
-    v-for="(value, key, index) in energyValueInputs">
+    v-for="(value, key, index) in nutrValueInputs">
     <p>{{ pseudos[index] }}:</p>
     <input type="text"
       @input="validateInput(key, value)"
-      v-model="energyValueInputs[key]">
+      v-model="nutrValueInputs[key]">
   </div>
   <button @click="submitProduct">
-    Submit
+    {{ submitButtonText }}
   </button>
-  <p v-if="productAddedFlag">
-    Product was added
-  </p>
-  <p v-if="notEnoughInfoFlag">
-    Not enough information provided
+  <button @click="cancelOperation">
+    {{ clearButtonText }}
+  </button>
+  <p class="result-message">
+    {{ resultMessage }}
   </p>
   <hr>
 </template>
@@ -183,5 +276,8 @@ function clearInput() {
   }
   .energy-value-input input {
     width: 50px;
+  }
+  .result-message {
+    height: 20px;
   }
 </style>

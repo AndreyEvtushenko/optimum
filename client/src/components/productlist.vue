@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import useStore from '../stores/products.js';
 import request from '../libs/requests.js';
 
@@ -13,10 +13,10 @@ const productListNotEmpty = computed(() => {
 
 async function getProducts() {
   const products = await request.get('/api/products');
-  store.products = makeEnergyValuesPer100(products);
+  store.products = makeNutrValuesPer100(products);
 }
 
-function makeEnergyValuesPer100(products) {
+function makeNutrValuesPer100(products) {
   for(let product of products) {
     for(let key in product) {
       if(key == 'id' || key == 'name')
@@ -27,6 +27,11 @@ function makeEnergyValuesPer100(products) {
     }
   }
   return products;
+}
+
+function editProduct(product) {
+  store.editableProduct = product;
+  store.editProductFlag = true;
 }
 </script>
 
@@ -54,7 +59,9 @@ function makeEnergyValuesPer100(products) {
         <span>{{ product.proteins }}</span>
         <span>{{ product.fats }}</span>
         <span>{{ product.carbohydrates }}</span>
-        <button>Edit</button>
+        <button @click="editProduct(product)">
+          Edit
+        </button>
         <button>Delete</button>
       </div>
     </div>
@@ -76,7 +83,7 @@ function makeEnergyValuesPer100(products) {
     width: 450px;
   }
   .products .list {
-    height: 600px;
+    height: 550px;
     overflow-x: auto;
   }
   .list .product {
