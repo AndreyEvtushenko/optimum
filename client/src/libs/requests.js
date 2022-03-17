@@ -39,6 +39,8 @@ export default {
     });
     if(!res.ok) {
       console.log('HTTP-Error:', res.status);
+      return res.ok;
     }
+    return await res.json();
   }
 }

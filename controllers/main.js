@@ -89,8 +89,19 @@ export default {
 
   async patchProduct(req, res) {
     const productId = req.params.id;
-    const newProductValues = req.body;
-    await queries.updateProduct(newProductValues, productId);
+    const newValues = req.body;
+    await queries.updateProduct(newValues, productId);
     res.end();
+  },
+
+  async delProduct(req, res) {
+    const productId = req.params.id;
+    try {
+      const result = await queries.delProduct(productId);
+      res.json(result.affectedRows);
+    } catch(error) {
+      console.log(error.code);
+      res.json(error.code);
+    }
   }
 }

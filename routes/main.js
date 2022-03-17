@@ -16,5 +16,6 @@ router.delete('/api/totalstat/:date', ctrl.delDayTotalStat);
 router.post('/api/product', ctrl.postProduct);
 router.get('/api/products', ctrl.getProducts);
 router.patch('/api/product/:id', ctrl.patchProduct);
+router.delete('/api/product/:id', ctrl.delProduct);
 
 export default router;

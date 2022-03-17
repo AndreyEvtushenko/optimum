@@ -33,6 +33,28 @@ function editProduct(product) {
   store.editableProduct = product;
   store.editProductFlag = true;
 }
+
+async function deleteProduct(product) {
+  if(!confirm('Do you really want delete it?'))
+    return;
+  const id = product.id;
+  const URL = `/api/product/${id}`;
+  const result = await request.delete(URL);
+  
+  if(result == 'ER_ROW_IS_REFERENCED') {
+    alert('Can\'t be deleted due to presence ' + 
+    'as ingridient or in eaten food');
+  // number of affected Rows
+  } else if (result == 1) {
+    deleteFromList(product);
+  }
+}
+
+function deleteFromList(deletedProduct) {
+  store.products = store.products.filter(
+    product => product != deletedProduct
+  );
+}
 </script>
 
 <template>
@@ -62,7 +84,9 @@ function editProduct(product) {
         <button @click="editProduct(product)">
           Edit
         </button>
-        <button>Delete</button>
+        <button @click="deleteProduct(product)">
+          Delete
+        </button>
       </div>
     </div>
   </div>

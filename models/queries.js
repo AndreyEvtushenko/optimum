@@ -121,17 +121,25 @@ export default {
       'fats_1 = ?, ' +
       'carbohydrates_1 = ? ' +
       'WHERE food_id = ?';
-    return new Promise(this.executor.bind(this));   
+    return new Promise(this.executor.bind(this));
+  },
+
+  delProduct(productId) {
+    this.values = [productId];
+    this.queryText = 'DELETE FROM food ' +
+      'WHERE food_id = ?';
+    return new Promise(this.executor.bind(this));
   },
 
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {
-        console.log('Something bad happened: ', error.stack);
+        console.log('Something bad happened: ');
         reject(error);
+      } else {
+        console.log('Query completed successfully');
+        resolve(results);
       }
-      console.log('Query completed successfully');
-      resolve(results);
     });
   }
 }
