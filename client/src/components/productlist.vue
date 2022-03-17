@@ -64,7 +64,11 @@ function deleteFromList(deletedProduct) {
   <div class="products"
     v-if="productListNotEmpty">
     <div class="header">
-      <span class="product-name"></span>
+      <span class="product-name">
+        <input class="filter" type="text"
+          placeholder="filter..."
+          v-model="store.productFilter">
+      </span>
       <span>Kcal</span>
       <span>Prots.</span>
       <span>Fats</span>
@@ -72,7 +76,7 @@ function deleteFromList(deletedProduct) {
     </div>
     <div class="list">
       <div class="product"
-        v-for="product in store.products"
+        v-for="product in store.filteredProducts"
         :key="product.food_id">
         <span class="product-name">
           {{ product.name }}
@@ -105,6 +109,9 @@ function deleteFromList(deletedProduct) {
   }
   span.product-name {
     width: 450px;
+  }
+  .product-name .filter {
+    width: 430px;
   }
   .products .list {
     height: 550px;
