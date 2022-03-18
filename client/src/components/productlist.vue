@@ -1,19 +1,55 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import useStore from '../stores/products.js';
 import request from '../libs/requests.js';
 
 const store = useStore();
+const showButtonText = ref('Show products');
+const productFilterInputRef = ref(null);
+const resultMessage = ref('');
 
-const productListNotEmpty = computed(() => {
+const productListIsEmpty = computed(() => {
   if(store.products.length)
-    return true;
-  return false;
+    return false;
+  return true;
+});
+
+const filteredProductsListIsEmpty = computed(() => {
+  if(store.filteredProducts.length)
+    return false;
+  return true;
+});
+
+watch(productListIsEmpty, (newValue) => {
+  if(!newValue)
+    showButtonText.value = 'Reload';   
+  else
+    showButtonText.value = 'Show products';
+});
+
+watch(productFilterInputRef, (newValue) => {
+  if(newValue)
+    productFilterInputRef.value.focus();
+});
+
+watch(() => store.productFilter.length,
+  (newValue) => {
+    if(newValue > 1 && store.filteredProducts.length == 0)
+      resultMessage.value = 'No such product';
+});
+
+watch(resultMessage, (newValue) => {
+  if(newValue)
+    setTimeout(() => resultMessage.value = '', 2000);
 });
 
 async function getProducts() {
   const products = await request.get('/api/products');
-  store.products = makeNutrValuesPer100(products);
+  if(products.length) {
+    store.products = makeNutrValuesPer100(products);
+  } else {
+    resultMessage.value = 'There are no products';
+  }
 }
 
 function makeNutrValuesPer100(products) {
@@ -59,13 +95,16 @@ function deleteFromList(deletedProduct) {
 
 <template>
   <button @click="getProducts">
-    Show products
+    {{ showButtonText }}
   </button>
-  <div class="products"
-    v-if="productListNotEmpty">
+  <p v-if="productListIsEmpty">
+    {{ resultMessage }}
+  </p>
+  <div class="products" v-else>
     <div class="header">
       <span class="product-name">
         <input class="filter" type="text"
+          ref="productFilterInputRef"
           placeholder="filter..."
           v-model="store.productFilter">
       </span>
@@ -74,7 +113,10 @@ function deleteFromList(deletedProduct) {
       <span>Fats</span>
       <span>Carbs.</span>
     </div>
-    <div class="list">
+    <p v-if="filteredProductsListIsEmpty">
+      No such products
+    </p>
+    <div class="list" v-else>
       <div class="product"
         v-for="product in store.filteredProducts"
         :key="product.food_id">
