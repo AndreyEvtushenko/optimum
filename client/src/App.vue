@@ -6,9 +6,11 @@
   <nav>
     <router-link to="/">Main</router-link>
     <router-link to="/products">Products</router-link>
+    <router-link to="/dishes">Dishes</router-link>
   </nav>
   <router-view></router-view>
   <router-view name="ProductList"></router-view>
+  <router-view name="DishList"></router-view>
 </template>
 
 <style>
