@@ -6,7 +6,8 @@ export default defineStore('productsId', {
       products: [],
       productFilter: '',
       editableProduct: {},
-      editProductFlag: false
+      editProductFlag: false,
+      scrollToBottomFlag: false
     }
   },
 

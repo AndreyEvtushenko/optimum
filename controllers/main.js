@@ -78,8 +78,8 @@ export default {
 
   async postProduct(req, res) {
     const product = req.body;
-    await queries.insertProduct(product);
-    res.end();
+    const result = await queries.insertProduct(product);
+    res.json(result.insertId);
   },
 
   async getProducts(req, res) {

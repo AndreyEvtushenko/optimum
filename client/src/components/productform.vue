@@ -29,8 +29,7 @@ watch(() => resultMessage.value,
     setTimeout(() => resultMessage.value = '', 2000);
 });
 
-watch(
-  () => store.editProductFlag,
+watch(() => store.editProductFlag,
   (newValue) => {
     if(!newValue) {
       submitButtonText.value = 'Submit';
@@ -59,7 +58,7 @@ function fillInputsForEdit() {
   }
 }
 
-function validateInput(key, prevInput) {
+function validateNutrInput(key, prevInput) {
   let input = nutrValueInputs[key];
   input = processInputLength(key, input, prevInput);
 
@@ -217,9 +216,10 @@ function clearInput() {
 }
 
 async function addProduct() {
-  const success = await sendNewProduct();
-  if(success) {
+  const product_id = await sendNewProduct();
+  if(product_id > 0) {
     resultMessage.value = 'Product was added';
+    addProductToList(product_id);
     clearInput();
   } else {
     resultMessage.value = 'Product wasn\'t added';
@@ -229,6 +229,23 @@ async function addProduct() {
 function sendNewProduct() {
   const URL = '/api/product';
   return request.post(URL, product.value);
+}
+
+function addProductToList(product_id) {
+  const productItem = prepareProductListItem(product_id);
+  store.products.push(productItem);
+  store.scrollToBottomFlag = true;
+}
+
+function prepareProductListItem(product_id) {
+  const productItem = {
+    id: product_id,
+    name: productNameInput.value
+  }
+  for(let key in nutrValueInputs) {
+    productItem[key] = (+nutrValueInputs[key]).toFixed(2);
+  }
+  return productItem;
 }
 
 function cancelOperation() {
@@ -243,13 +260,13 @@ function cancelOperation() {
   <input class="product-name" type="text"
     ref="productNameInputRef"
     placeholder="product name"
-    v-model="productNameInput"
-    @input="process">
+    maxlength="64"
+    v-model="productNameInput">
   <div class="energy-value-input"
     v-for="(value, key, index) in nutrValueInputs">
     <p>{{ pseudos[index] }}:</p>
     <input type="text"
-      @input="validateInput(key, value)"
+      @input="validateNutrInput(key, value)"
       v-model="nutrValueInputs[key]">
   </div>
   <button @click="submitProduct">

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onUpdated } from 'vue';
 import useStore from '../stores/products.js';
 import request from '../libs/requests.js';
 
@@ -43,12 +43,28 @@ watch(resultMessage, (newValue) => {
     setTimeout(() => resultMessage.value = '', 2000);
 });
 
+//we need scroll to bottom after vue will update DOM
+//because only then there will be right ScrollHeight value
+onUpdated(() => {
+  if(store.scrollToBottomFlag)
+    scrollToBottom();
+    store.scrollToBottomFlag = false;
+});
+
 async function getProducts() {
   const products = await request.get('/api/products');
   if(products.length) {
     store.products = makeNutrValuesPer100(products);
   } else {
     resultMessage.value = 'There are no products';
+  }
+}
+
+function scrollToBottom() {
+  const list = document.getElementById('list-elem');
+  if(list) {
+    const scrollHeight = list.scrollHeight;
+    list.scrollTop = scrollHeight;
   }
 }
 
@@ -97,6 +113,9 @@ function deleteFromList(deletedProduct) {
   <button @click="getProducts">
     {{ showButtonText }}
   </button>
+  <button @click="scrollToBottom">
+    Scroll to bottom
+  </button>
   <p v-if="productListIsEmpty">
     {{ resultMessage }}
   </p>
@@ -116,7 +135,7 @@ function deleteFromList(deletedProduct) {
     <p v-if="filteredProductsListIsEmpty">
       No such products
     </p>
-    <div class="list" v-else>
+    <div id="list-elem" class="list" v-else>
       <div class="product"
         v-for="product in store.filteredProducts"
         :key="product.food_id">
