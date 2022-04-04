@@ -1,0 +1,307 @@
+<script setup>
+import { reactive, ref, watch, computed, onMounted } from 'vue';
+import useStore from '../stores/cooked.js';
+import request from '../libs/requests.js';
+import { validateWeightInput } from '../libs/common.js';
+import IngridientForm from './ingridientform.vue';
+
+const store = useStore();
+const cooked = reactive({
+  id: '',
+  name: '',
+  weight: '',
+  nutrValues1: [],
+  date: new Date().toDateString()
+});
+const ingridients = reactive(new Set());
+
+const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
+const showDeleteButton = [false];
+//base value for ingridients list ids
+let index = 0;
+
+const resultMessage = ref('');
+watch(resultMessage, (newValue) => {
+  if(newValue)
+    setTimeout(() => resultMessage.value = '', 2000);
+});
+
+onMounted(() => {
+  addNewIngrToSet();
+});
+
+const ingridientsIds = computed(() => {
+  const chosenIds = [];
+  for(let ingridient of ingridients) {
+    if(ingridient.id && ingridient.id !== null) {
+      chosenIds.push(ingridient.id);
+    }
+  }
+  return chosenIds;
+});
+
+const newFormCanBeAdded = computed(() => {
+  if(ingridientsCapReached.value) 
+    return false;
+  for(let ingridient of ingridients) {
+    if(ingridient.name == '' || ingridient.weight == '') {
+      return false;
+    } else if(!ingridient.id) {
+      return false;
+    }
+  }
+  return true;
+});
+
+const ingridientsCapReached = computed(() => {
+  if(ingridients.size == 20)
+    return true;
+  return false;
+});
+
+const cookedNutrValues1 = computed(() => {
+  const nutrValuesSum = getNutrValuesSum();
+
+  if(nutrValuesAreZero(nutrValuesSum) || cooked.weight == '') {
+    return false;
+  }
+
+  return nutrValuesSum.map(item => +(item /= cooked.weight).toFixed(2));
+});
+
+const cookedNutrValues100 = computed(() => {
+  if(!cookedNutrValues1.value)
+    return ['-', '-', '-', '-'];
+  return cookedNutrValues1.value.map(item => +(item * 100).toFixed(2));
+});
+
+watch(() => ingridients.size,
+  (newValue, oldValue) => {
+    if(newValue > oldValue && newValue != 1)
+      showDeleteButton.unshift(true);
+    else if (newValue < oldValue)
+      showDeleteButton.shift();
+});
+
+watch(cookedNutrValues1, (newValue) => {
+  if(!newValue) {
+    cooked.nutrValues1 = [];
+  } else {
+    cooked.nutrValues1 = newValue;
+  }
+});
+
+function getNutrValuesSum() {
+  const nutrValuesSum = [0, 0, 0, 0];
+  for(let ingridient of ingridients) {
+    if(!ingridient.nutrValuesW) {
+      continue;
+    }
+    for(let index = 0; index < 4; index++) {
+      nutrValuesSum[index] += ingridient.nutrValuesW[index];
+    }
+  }
+  return nutrValuesSum;
+}
+
+function nutrValuesAreZero(nutrValues) {
+  let zero = false;
+  for(let value of nutrValues) {
+    if(value == 0) {
+      zero = true;
+    }
+  }
+  return zero;
+}
+
+function addNewForm() {
+  if(ingridientsCapReached.value) {
+    resultMessage.value = 'Ingridients cap reached';
+    return;
+  }
+  if(newFormCanBeAdded.value) {
+    addNewIngrToSet();
+  }
+}
+
+function addNewIngrToSet() {
+  ingridients.add({
+    listId: index++
+  });
+}
+
+function delIngridient(ingridient) {
+  ingridients.delete(ingridient)
+}
+
+async function submitCooked() {
+  if(!cookedNutrValuesAreCorrect())
+    return;
+
+  if(!cookedCanBeSubmitted()) 
+    return;
+  
+  const result = await sendCooked();
+  checkSendingResult(result);
+}
+
+function cookedNutrValuesAreCorrect() {
+  if(cookedNutrValues100.value[0] > 1000) {
+    resultMessage.value = 'Too many calories. Check your data';
+    return false;
+  }
+  if(cookedNutrValues100.value[1] > 100) {
+    resultMessage.value = 'Too many proteins. Check your data';
+    return false;
+  }
+  if(cookedNutrValues100.value[2] > 100) {
+    resultMessage.value = 'Too many fats. Check your data';
+    return false;
+  }
+  if(cookedNutrValues100.value[3] > 100) {
+    resultMessage.value = 'Too many carbohydrates. Check your data';
+    return false;
+  }
+  return true;
+}
+
+function cookedCanBeSubmitted() {
+  if(cooked.name != '' && cooked.weight != 0 && ingridients.size > 1) {
+    return true;
+  } else {
+    resultMessage.value = 'Not enough data';
+    return false;
+  }
+}
+
+function sendCooked() {
+  const URL = '/api/cooked';
+  const ingrsForSending = getIngrArrForSending();
+  const cookedForSending = getCookedObjForSending(ingrsForSending);
+  return request.post(URL, cookedForSending);
+}
+
+function checkSendingResult(result) {
+  if(result === false) {
+    resultMessage.value = 'Cooked wasn\'t added';
+  } else {
+    resultMessage.value = 'Cooked is added';
+    cooked.id = result;
+    cleanForm();
+  }
+}
+
+function cleanForm() {
+  cooked.id = '';
+  cooked.name = '';
+  cooked.weight = '';
+  cooked.nutrValues1 = [];
+  ingridients.clear();
+  addNewIngrToSet();
+}
+
+function getIngrArrForSending() {
+  const arr = [];
+  for(let ingridient of ingridients) {
+    if(ingridient.id && ingridient.id !== null && ingridient.weight > 0) {
+      arr.push({
+        ingrId: ingridient.id,
+        ingrWeight: ingridient.weight 
+      });
+    }
+  }
+  return arr;
+}
+
+function getCookedObjForSending(ingrsForSending) {
+  const obj = {};
+
+  Object.assign(obj, cooked);
+  obj.kcal_1 = cooked.nutrValues1[0];
+  obj.proteins_1 = cooked.nutrValues1[1];
+  obj.fats_1 = cooked.nutrValues1[2];
+  obj.carbohydrates_1 = cooked.nutrValues1[3];
+  delete obj.id;
+  delete obj.nutrValues1;
+  obj.ingridients = ingrsForSending;
+  
+  return obj;
+}
+
+function cancelOperation() {
+  cleanForm();
+}
+</script>
+
+<template>
+  <input class="name" type="text"
+    ref="cookedNameInputRef"
+    placeholder="cooked thing name"
+    maxlength="64"
+    v-model="cooked.name">
+  <input class="weight" type="text"
+    placeholder="cooked weight"
+    maxlength="4"
+    @input="cooked.weight = validateWeightInput($event)"
+    v-model="cooked.weight">
+  <p>Ingridients:</p>
+  <div class="ingridients">
+    <div class="header">
+      <span class="indent"></span>
+      <span v-for="value in pseudos">{{ value }}</span>
+    </div>
+    <div v-for="(ingridient, index) in ingridients"
+      :key="ingridient.listId">
+      <IngridientForm
+        :chosenIds="ingridientsIds"
+        v-model:id="ingridient.id"
+        v-model:name="ingridient.name"
+        v-model:weight="ingridient.weight"
+        v-model:nutrValues1="ingridient.nutrValues1"
+        v-model:nutrValuesW="ingridient.nutrValuesW"
+        @ingridientIsFull="addNewForm"
+        @ingridientIsEmptied="delIngridient(ingridient)"
+      />
+      <button v-if="showDeleteButton[index] || ingridient.id"
+        @click="delIngridient(ingridient)">
+        Delete
+      </button>
+    </div>
+  </div>
+  <hr>
+  <span class="indent">Nutritional value (per 100g):</span>
+  <span v-for="value in cookedNutrValues100">
+    {{ value }}
+  </span>
+  <button @click="submitCooked">
+    Submit
+  </button>
+  <button @click="cancelOperation">
+    Clean
+  </button>
+  <p class="result-message">
+    {{ resultMessage }}
+  </p>
+  <hr>
+</template>
+
+<style>
+  input.name {
+    width: 400px;
+    margin: 5px;
+  }
+  input.weight {
+    width: 90px;
+    margin: 5px;
+  }
+  span {
+    display: inline-block;
+    width: 60px;
+  }
+  .indent {
+    width: 525px;
+  }
+  ul {
+    list-style-type: none;
+  }
+</style>

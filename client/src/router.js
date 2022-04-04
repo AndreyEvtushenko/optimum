@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Main from './components/main.vue';
 import ProductForm from './components/productform.vue';
 import ProductList from './components/productlist.vue';
-import DishForm from './components/dishform.vue';
-import DishList from './components/dishlist.vue';
+import CookedList from './components/cookedlist.vue';
+import CookedForm from './components/cookedform.vue';
 
 export default createRouter({
   history: createWebHistory(),
@@ -20,10 +20,10 @@ export default createRouter({
       }
     },
     {
-      path: '/dishes',
+      path: '/Cooked',
       components: {
-        default: DishForm,
-        DishList
+        default: CookedForm,
+        CookedList
       }
     }
   ]

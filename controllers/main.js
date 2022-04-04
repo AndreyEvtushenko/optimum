@@ -1,5 +1,6 @@
 import path from 'path';
 import queries from '../models/queries.js';
+import transactions from '../models/transactions.js';
 
 const appPath = path.resolve();
 
@@ -103,5 +104,11 @@ export default {
       console.log(error.code);
       res.json(error.code);
     }
-  }
+  },
+
+  async postCookedAndIngrs(req, res) {
+    const cooked = req.body;
+    const result = await transactions.insertCookedAndIngrs(cooked);
+    res.json(result);
+  },
 }

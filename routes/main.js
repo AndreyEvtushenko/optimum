@@ -17,5 +17,6 @@ router.post('/api/product', ctrl.postProduct);
 router.get('/api/products', ctrl.getProducts);
 router.patch('/api/product/:id', ctrl.patchProduct);
 router.delete('/api/product/:id', ctrl.delProduct);
+router.post('/api/cooked', ctrl.postCookedAndIngrs);
 
 export default router;
