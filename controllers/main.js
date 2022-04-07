@@ -111,4 +111,16 @@ export default {
     const result = await transactions.insertCookedAndIngrs(cooked);
     res.json(result);
   },
+
+  async getLastCooked(req, res) {
+    const count = req.params.count;
+    const result = await queries.getLastCooked(count);
+    res.json(result[0]);
+  },
+
+  async getIngridients(req, res) {
+    const cookedId = req.params.id;
+    const result = await queries.getIngridients(cookedId);
+    res.json(result[0]);
+  }
 }

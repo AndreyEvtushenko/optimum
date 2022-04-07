@@ -18,5 +18,7 @@ router.get('/api/products', ctrl.getProducts);
 router.patch('/api/product/:id', ctrl.patchProduct);
 router.delete('/api/product/:id', ctrl.delProduct);
 router.post('/api/cooked', ctrl.postCookedAndIngrs);
+router.get('/api/cooked/last/:count', ctrl.getLastCooked);
+router.get('/api/cooked/ingrs/:id', ctrl.getIngridients);
 
 export default router;
