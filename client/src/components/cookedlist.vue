@@ -44,10 +44,9 @@ function deleteSuggestion() {
   }
 }
 
-function showCooked(event) {
-  const cookedCount = event.target.value;
+function showLastCooked(event) {
   howManyToShowValue = event.target.value;
-  getLastCooked(cookedCount);
+  getLastCooked(howManyToShowValue);
   checkRetrievedCookedList();
 }
 
@@ -60,6 +59,21 @@ function checkRetrievedCookedList() {
   if(cookedListIsEmpty.value) {
     resultMessage.value = 'Nothing to show';
   }
+}
+
+function showCookedMatches(event) {
+  const filter = event.target.value;
+  if(filter.length < 2) {
+    store.cookedList = [];
+    howManyToShowValue = 0;
+  } else {
+    getCookedMatches(filter);
+  }
+}
+
+async function getCookedMatches(filter) {
+  const URL = `/api/cooked/matches/${filter}`;
+  store.cookedList = await request.get(URL);
 }
 
 async function getIngridients(cooked) {
@@ -115,6 +129,8 @@ function deleteFromCookedList(deletedCooked, deletedIndex) {
 }
 
 async function getOneMoreCooked() {
+  if(howManyToShowValue == 0)
+    return;
   const count = howManyToShowValue;
   const URL = `/api/cooked/first/${count}`;
   const result = await request.get(URL);
@@ -126,16 +142,20 @@ async function useAsBase(cooked) {
   store.editableCooked = cooked;
   store.baseCookedFlag = true;
 }
-
 </script>
 
 <template>
-  <select @change="showCooked($event)"
+  <select @change="showLastCooked($event)"
     @focus="deleteSuggestion">
     <option v-for="item in howManyToShowList"
       :key="item.value"
       :value="item.value">{{ item.text }}</option>
   </select>
+  <span>or</span>
+  <input class="search" type="text"
+    placeholder="search..."
+    maxlength=64
+    @input="showCookedMatches($event)">
   <p v-if="cookedListIsEmpty">
     {{ resultMessage }}
   </p>
@@ -186,6 +206,9 @@ async function useAsBase(cooked) {
 <style>
   select {
     width: 120px;
+  }
+  .search {
+    width: 430px;
   }
   .cooked-list {
     margin: 10px;

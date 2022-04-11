@@ -154,5 +154,12 @@ export default {
     const count = req.params.count;
     const result = await queries.getFirstFromLastCooked(count);
     res.json(result[0][0]);
-  },  
+  },
+  
+  async getCookedMatches(req, res) {
+    const filter = req.params.input;
+    const result = await queries.getCookedMatches(filter);
+    res.json(result[0]);
+  },
+  
 }

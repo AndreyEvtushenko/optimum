@@ -171,6 +171,12 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  getCookedMatches(filter) {
+    this.values = ['%' + filter + '%'];
+    this.queryText = 'CALL select_cooked_matches(?)';
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {
