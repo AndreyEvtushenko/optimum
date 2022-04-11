@@ -3,6 +3,9 @@ import { reactive, ref, watch, computed, onMounted } from 'vue';
 import useStore from '../stores/cooked.js';
 import request from '../libs/requests.js';
 import { validateWeightInput } from '../libs/common.js';
+import { getCookedObjForSending, getIngrsForSending, nutrValues100 } 
+  from '../libs/cookedform.js';
+import editCookedAndIngrs from '../libs/editcookedandingrs.js';
 import IngridientForm from './ingridientform.vue';
 
 const store = useStore();
@@ -13,10 +16,14 @@ const cooked = reactive({
   nutrValues1: [],
   date: new Date().toDateString()
 });
+// ingridients item props:
+// { id, listId, name, weight, nutrValues1: Object, nutrValuesW: Array }
 const ingridients = reactive(new Set());
 
 const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
 const showDeleteButton = [false];
+const submitButtonText = ref('Submit');
+const clearButtonText = ref('Clean');
 //base value for ingridients list ids
 let index = 0;
 
@@ -72,7 +79,7 @@ const cookedNutrValues1 = computed(() => {
 const cookedNutrValues100 = computed(() => {
   if(!cookedNutrValues1.value)
     return ['-', '-', '-', '-'];
-  return cookedNutrValues1.value.map(item => +(item * 100).toFixed(2));
+  return nutrValues100(cookedNutrValues1.value);
 });
 
 watch(() => ingridients.size,
@@ -90,6 +97,24 @@ watch(cookedNutrValues1, (newValue) => {
     cooked.nutrValues1 = newValue;
   }
 });
+
+watch(() => store.editCookedFlag,
+  (newValue) => {
+    if(!newValue) {
+      submitButtonText.value = 'Submit';
+      clearButtonText.value = 'Clean';
+      return;
+    }
+    fillFormForEditing();
+    submitButtonText.value = 'Save changes';
+    clearButtonText.value = 'Cancel';
+})
+
+function addNewIngrToSet() {
+  ingridients.add({
+    listId: index++
+  });
+}
 
 function getNutrValuesSum() {
   const nutrValuesSum = [0, 0, 0, 0];
@@ -114,6 +139,37 @@ function nutrValuesAreZero(nutrValues) {
   return zero;
 }
 
+function fillFormForEditing() {
+  cooked.id = store.editableCooked.id;
+  cooked.name = store.editableCooked.name;
+  cooked.weight = store.editableCooked.weight;
+
+  fillIngrsForEditing();
+}
+
+function fillIngrsForEditing() {
+  ingridients.clear();
+  for(let editable of store.editableCooked.ingridients) {
+    ingridients.add({
+      listId: index++,
+      id: editable.id,
+      name: editable.name,
+      weight: editable.weight,
+      nutrValues1: getNutrValuesForEditing(editable)
+    });
+  }
+  addNewIngrToSet();
+}
+
+function getNutrValuesForEditing(editable) {
+  return {
+    kcal_1: editable.kcal_1,
+    proteins_1: editable.proteins_1,
+    fats_1: editable.fats_1,
+    carbohydrates_1: editable.carbohydrates_1,
+  };
+}
+
 function addNewForm() {
   if(ingridientsCapReached.value) {
     resultMessage.value = 'Ingridients cap reached';
@@ -124,12 +180,6 @@ function addNewForm() {
   }
 }
 
-function addNewIngrToSet() {
-  ingridients.add({
-    listId: index++
-  });
-}
-
 function delIngridient(ingridient) {
   ingridients.delete(ingridient)
 }
@@ -137,12 +187,17 @@ function delIngridient(ingridient) {
 async function submitCooked() {
   if(!cookedNutrValuesAreCorrect())
     return;
-
-  if(!cookedCanBeSubmitted()) 
+  if(!cookedCanBeSubmitted())
     return;
-  
-  const result = await sendCooked();
-  checkSendingResult(result);
+    
+  if(store.editCookedFlag) {
+    const result = await editCookedAndIngrs(store.editableCooked, 
+      cooked, ingridients);    
+    checkUpdateResult(result)
+  } else {
+    const result = await sendCooked();
+    checkSendingResult(result);
+  }
 }
 
 function cookedNutrValuesAreCorrect() {
@@ -174,10 +229,20 @@ function cookedCanBeSubmitted() {
   }
 }
 
+function checkUpdateResult(result) {
+  resultMessage.value = result;
+  if(result == 'Changes were saved') {
+    cleanForm();
+    store.editCookedFlag = false;
+  }
+}
+
 function sendCooked() {
   const URL = '/api/cooked';
-  const ingrsForSending = getIngrArrForSending();
-  const cookedForSending = getCookedObjForSending(ingrsForSending);
+  const ingrsForSending = getIngrsForSending(ingridients);
+  const cookedForSending = getCookedObjForSending(cooked);
+  cookedForSending.ingridients = ingrsForSending;
+
   return request.post(URL, cookedForSending);
 }
 
@@ -200,35 +265,8 @@ function cleanForm() {
   addNewIngrToSet();
 }
 
-function getIngrArrForSending() {
-  const arr = [];
-  for(let ingridient of ingridients) {
-    if(ingridient.id && ingridient.id !== null && ingridient.weight > 0) {
-      arr.push({
-        ingrId: ingridient.id,
-        ingrWeight: ingridient.weight 
-      });
-    }
-  }
-  return arr;
-}
-
-function getCookedObjForSending(ingrsForSending) {
-  const obj = {};
-
-  Object.assign(obj, cooked);
-  obj.kcal_1 = cooked.nutrValues1[0];
-  obj.proteins_1 = cooked.nutrValues1[1];
-  obj.fats_1 = cooked.nutrValues1[2];
-  obj.carbohydrates_1 = cooked.nutrValues1[3];
-  delete obj.id;
-  delete obj.nutrValues1;
-  obj.ingridients = ingrsForSending;
-  
-  return obj;
-}
-
 function cancelOperation() {
+  store.editCookedFlag = false;
   cleanForm();
 }
 </script>
@@ -274,10 +312,10 @@ function cancelOperation() {
     {{ value }}
   </span>
   <button @click="submitCooked">
-    Submit
+    {{ submitButtonText }}
   </button>
   <button @click="cancelOperation">
-    Clean
+    {{ clearButtonText }}
   </button>
   <p class="result-message">
     {{ resultMessage }}

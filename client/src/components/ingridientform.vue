@@ -11,7 +11,7 @@ const props = defineProps([
   'name', 
   'weight', 
   'nutrValues1', 
-  'nutrValuesW'
+  'nutrValuesW',
   ]);
 const emit = defineEmits([
   'update:id', 
@@ -30,10 +30,13 @@ const nutrValuesPerWeight = computed(() => {
   
   const nutrValuesW = [];
   const nutrValues1 = props.nutrValues1;
-  const weight = props.weight;    
+  const weight = props.weight;
   for(let key in nutrValues1) {
     nutrValuesW.push(+(nutrValues1[key] * weight).toFixed(2));
   }
+  //it's a crutch. When props are defined from the outside,
+  //watcher doesn't work
+  emit('update:nutrValuesW', nutrValuesW);
   return nutrValuesW;
 });
 
@@ -58,9 +61,8 @@ const foodMatchesWithoutChosen = computed(() => {
 });
 
 watch(enoughDataProvided, (newValue) => {
-  if(newValue) {
+  if(newValue)
     emit('ingridientIsFull');
-  }
 });
 
 watch(nutrValuesPerWeight, (newValue) => {
@@ -68,7 +70,7 @@ watch(nutrValuesPerWeight, (newValue) => {
     emit('update:nutrValuesW', null);
   else {
     emit('update:nutrValuesW', newValue);
-  }    
+  }
 });
 
 function showFoodMatches(event) {

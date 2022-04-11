@@ -74,6 +74,12 @@ function toggleIngrsButton(index) {
 function hideIngridients(index) {
   showIngridients[index] = false;
 }
+
+async function editCooked(cooked) {
+  await getIngridients(cooked);
+  store.editableCooked = cooked;
+  store.editCookedFlag = true;
+}
 </script>
 
 <template>
@@ -112,6 +118,9 @@ function hideIngridients(index) {
         <button v-else
           @click="getIngridients(cooked), toggleIngrsButton(index)">
           Ingrs.
+        </button>
+        <button @click="editCooked(cooked)">
+          Edit
         </button>
         <IngridientList v-if="showIngridients[index]"
           :foodList="cooked.ingridients"

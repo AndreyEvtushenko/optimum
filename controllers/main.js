@@ -122,5 +122,20 @@ export default {
     const cookedId = req.params.id;
     const result = await queries.getIngridients(cookedId);
     res.json(result[0]);
-  }
+  },
+
+  async patchCooked(req, res) {
+    const cookedId = req.params.id;
+    const newValues = req.body;
+    const result = await queries.updateCooked(newValues, cookedId);
+    res.json(result.changedRows);
+  },
+
+  async patchCookedAndIngrs(req, res) {
+    const cookedId = req.params.id;
+    const newValues = req.body;
+    const result = await transactions
+      .updateCookedAndIngrs(newValues, cookedId);
+    res.json(result);
+  },
 }

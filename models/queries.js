@@ -143,6 +143,21 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  updateCooked(newCookedValues, cookedId) {
+    this.values = Object.values(newCookedValues);
+    this.values.push(cookedId);
+    this.queryText = 'UPDATE food ' +
+      'SET ' +
+      'food_name = ?, ' +
+      'weight = ?, ' +
+      'kcal_1 = ?, ' +
+      'proteins_1 = ?, ' +
+      'fats_1 = ?, ' +
+      'carbohydrates_1 = ? ' +
+      'WHERE food_id = ?';
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {
