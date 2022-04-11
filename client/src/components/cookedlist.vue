@@ -12,8 +12,10 @@ const howManyToShowList = reactive([
   { text: '15', value: 15 },
   { text: '30', value: 30 },
 ]);
+let howManyToShowValue;
 const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs', 'Date'];
-const showIngridients = reactive([]);
+// ref is used due to array replacement during deletion
+const showIngridients = ref([]);
 
 const resultMessage = ref('');
 watch(resultMessage, (newValue) => {
@@ -30,9 +32,9 @@ const cookedListIsEmpty = computed(() => {
 watch(() => store.cookedList.length,
   (newValue, oldValue) => {
     if(newValue - oldValue == 1) {
-      showIngridients.push(false);
+      showIngridients.value.push(false);
     } else if(oldValue == 0) {
-      store.cookedList.forEach(() => showIngridients.push(false));
+      store.cookedList.forEach(() => showIngridients.value.push(false));
     }
 });
 
@@ -44,6 +46,7 @@ function deleteSuggestion() {
 
 function showCooked(event) {
   const cookedCount = event.target.value;
+  howManyToShowValue = event.target.value;
   getLastCooked(cookedCount);
   checkRetrievedCookedList();
 }
@@ -68,11 +71,11 @@ async function getIngridients(cooked) {
 }
 
 function toggleIngrsButton(index) {
-  showIngridients[index] = true;
+  showIngridients.value[index] = true;
 }
 
 function hideIngridients(index) {
-  showIngridients[index] = false;
+  showIngridients.value[index] = false;
 }
 
 async function editCooked(cooked) {
@@ -80,6 +83,44 @@ async function editCooked(cooked) {
   store.editableCooked = cooked;
   store.editCookedFlag = true;
 }
+
+async function deleteCooked(cooked, index) {
+  if(!confirm('Do you really want delete it?'))
+    return;
+  const id = cooked.id;
+  const URL = `/api/cooked/${id}`;
+  const result = await request.delete(URL);
+
+  processDeleteResult(result, cooked, index);
+}
+
+function processDeleteResult(result, cooked, index) {
+  if(result == 'ER_ROW_IS_REFERENCED') {
+    alert('Can\'t be deleted due to presence ' + 
+    'as ingridient or in eaten food');
+  // number of affected Rows
+  } else if (result == 1) {
+    deleteFromCookedList(cooked, index);
+    getOneMoreCooked();
+  }
+}
+
+function deleteFromCookedList(deletedCooked, deletedIndex) {
+  showIngridients.value = showIngridients.value.filter(
+    (item, index) => index != deletedIndex
+  );
+  store.cookedList = store.cookedList.filter(
+    cooked => cooked != deletedCooked
+  );
+}
+
+async function getOneMoreCooked() {
+  const count = howManyToShowValue;
+  const URL = `/api/cooked/first/${count}`;
+  const result = await request.get(URL);
+  store.cookedList.unshift(result);
+}
+
 </script>
 
 <template>
@@ -121,6 +162,9 @@ async function editCooked(cooked) {
         </button>
         <button @click="editCooked(cooked)">
           Edit
+        </button>
+        <button @click="deleteCooked(cooked, index)">
+          Delete
         </button>
         <IngridientList v-if="showIngridients[index]"
           :foodList="cooked.ingridients"

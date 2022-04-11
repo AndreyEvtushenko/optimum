@@ -138,4 +138,21 @@ export default {
       .updateCookedAndIngrs(newValues, cookedId);
     res.json(result);
   },
+
+  async delCooked(req, res) {
+    const cookedId = req.params.id;
+    try {
+      const result = await queries.delCooked(cookedId);
+      res.json(result.affectedRows);
+    } catch(error) {
+      console.log(error.code);
+      res.json(error.code);
+    }
+  },
+
+  async getFirstFromLastCooked(req, res) {
+    const count = req.params.count;
+    const result = await queries.getFirstFromLastCooked(count);
+    res.json(result[0][0]);
+  },  
 }

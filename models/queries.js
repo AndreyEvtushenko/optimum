@@ -158,6 +158,19 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  delCooked(cookedId) {
+    this.values = [cookedId];
+    this.queryText = 'DELETE FROM food ' +
+      'WHERE food_id = ?';
+    return new Promise(this.executor.bind(this));
+  },
+
+  getFirstFromLastCooked(count) {
+    this.values = [count];
+    this.queryText = 'CALL select_first_from_last_cooked(?)';
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {
