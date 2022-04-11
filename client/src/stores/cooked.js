@@ -5,6 +5,7 @@ export default defineStore('cookedId', {
     return {
       editableCooked: {},
       editCookedFlag: false,
+      baseCookedFlag: false,
       // cookedList item props:
       // { id, name, weight, date: String, kcal, proteins,
       // fats, carbohydrates, ingridients: Array }

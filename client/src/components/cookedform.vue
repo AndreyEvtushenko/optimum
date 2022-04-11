@@ -72,8 +72,8 @@ const cookedNutrValues1 = computed(() => {
   if(nutrValuesAreZero(nutrValuesSum) || cooked.weight == '') {
     return false;
   }
-
-  return nutrValuesSum.map(item => +(item /= cooked.weight).toFixed(2));
+  
+  return nutrValuesSum.map(item => +(item /= cooked.weight).toFixed(4));
 });
 
 const cookedNutrValues100 = computed(() => {
@@ -108,7 +108,15 @@ watch(() => store.editCookedFlag,
     fillFormForEditing();
     submitButtonText.value = 'Save changes';
     clearButtonText.value = 'Cancel';
-})
+});
+
+watch(() => store.baseCookedFlag,
+  (newValue) => {
+    if(newValue) {
+      fillFormForEditing(true);
+      store.baseCookedFlag = false;
+    }
+});
 
 function addNewIngrToSet() {
   ingridients.add({
@@ -139,8 +147,10 @@ function nutrValuesAreZero(nutrValues) {
   return zero;
 }
 
-function fillFormForEditing() {
-  cooked.id = store.editableCooked.id;
+function fillFormForEditing(useAsBase = false) {
+  if(!useAsBase) {
+    cooked.id = store.editableCooked.id;
+  }  
   cooked.name = store.editableCooked.name;
   cooked.weight = store.editableCooked.weight;
 

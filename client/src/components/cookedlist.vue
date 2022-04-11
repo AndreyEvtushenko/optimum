@@ -121,6 +121,12 @@ async function getOneMoreCooked() {
   store.cookedList.unshift(result);
 }
 
+async function useAsBase(cooked) {
+  await getIngridients(cooked);
+  store.editableCooked = cooked;
+  store.baseCookedFlag = true;
+}
+
 </script>
 
 <template>
@@ -165,6 +171,9 @@ async function getOneMoreCooked() {
         </button>
         <button @click="deleteCooked(cooked, index)">
           Delete
+        </button>
+        <button @click="useAsBase(cooked)">
+          Base
         </button>
         <IngridientList v-if="showIngridients[index]"
           :foodList="cooked.ingridients"
