@@ -3,7 +3,8 @@ import { reactive, ref, watch, computed, onMounted } from 'vue';
 import useStore from '../stores/cooked.js';
 import request from '../libs/requests.js';
 import { validateWeightInput } from '../libs/common.js';
-import { getCookedObjForSending, getIngrsForSending, nutrValues100 } 
+import { getCookedObjForSending, getIngrsForSending, getCookedForList, 
+  nutrValues100, getIngrsForList, getIngrsArrFromSet } 
   from '../libs/cookedform.js';
 import editCookedAndIngrs from '../libs/editcookedandingrs.js';
 import IngridientForm from './ingridientform.vue';
@@ -260,10 +261,17 @@ function checkSendingResult(result) {
   if(result === false) {
     resultMessage.value = 'Cooked wasn\'t added';
   } else {
-    resultMessage.value = 'Cooked is added';
+    resultMessage.value = 'Cooked was added';
     cooked.id = result;
+    addCookedToList();
     cleanForm();
   }
+}
+
+function addCookedToList() {
+  const newCooked = getCookedForList(cooked);
+  newCooked.ingridients = getIngrsForList(ingridients);
+  store.cookedList.push(newCooked);
 }
 
 function cleanForm() {

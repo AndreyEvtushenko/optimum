@@ -13,7 +13,7 @@ const howManyToShowList = reactive([
   { text: '30', value: 30 },
 ]);
 let howManyToShowValue;
-const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs', 'Date'];
+const pseudos = ['Date', 'Kcal', 'Prots', 'Fats', 'Carbs'];
 // ref is used due to array replacement during deletion
 const showIngridients = ref([]);
 
@@ -31,6 +31,10 @@ const cookedListIsEmpty = computed(() => {
 
 watch(() => store.cookedList.length,
   (newValue, oldValue) => {
+    if(newValue > howManyToShowValue && howManyToShowValue != 0) {
+      store.cookedList.shift();
+      showIngridients.value.shift();
+    }
     if(newValue - oldValue == 1) {
       showIngridients.value.push(false);
     } else if(oldValue == 0) {
@@ -171,13 +175,13 @@ async function useAsBase(cooked) {
         <span class="cooked-name">
           {{ cooked.name }}
         </span>
-        <span>{{ cooked.kcal }}</span>
-        <span>{{ cooked.proteins }}</span>
-        <span>{{ cooked.fats }}</span>
-        <span>{{ cooked.carbohydrates }}</span>
         <span>
           {{ new Date(Date.parse(cooked.date)).toDateString() }}
         </span>
+        <span>{{ cooked.kcal }}</span>
+        <span>{{ cooked.proteins }}</span>
+        <span>{{ cooked.fats }}</span>
+        <span>{{ cooked.carbohydrates }}</span>        
         <button v-if="showIngridients[index]"
           @click="hideIngridients(index)">
           Hide

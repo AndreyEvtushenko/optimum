@@ -1,4 +1,4 @@
-import { getCookedObjForSending, getIngrsForSending, nutrValues100 } 
+import { getCookedObjForSending, getIngrsForSending, getCookedForList, nutrValues100, getIngrsForList, getIngrsArrFromSet } 
   from '../libs/cookedform.js';
 import request from '../libs/requests.js';
 
@@ -92,19 +92,9 @@ function processUpdateCookedResult(result, editable, editedCooked) {
   if(result == 0) {
     return 'Nothing changed';
   } else if(result == 1) {
-    updateCookedList(editable, editedCooked)
+    Object.assign(editable, getCookedForList(editedCooked, true));
     return 'Changes were saved';
   }
-}
-
-function updateCookedList(editable, editedCooked) {
-  const nutrValues = nutrValues100(editedCooked.nutrValues1);
-  editable.name = editedCooked.name;
-  editable.weight = editedCooked.weight;  
-  editable.kcal = nutrValues[0];
-  editable.proteins = nutrValues[1];
-  editable.fats = nutrValues[2];
-  editable.carbohydrates = nutrValues[3];
 }
 
 function updateCookedAndIngrs(cooked, ingridients) {
@@ -122,30 +112,8 @@ function processUpdateCookedAndIngrsResult(result, editable,
   if(!result) {
     return 'Changes weren\'t saved';
   } else if(result) {
-    updateCookedList(editable, editedCooked);
-    updateIngrsInCookedList(editable, editedIngrs);
+    Object.assign(editable, getCookedForList(editedCooked, true));
+    editable.ingridients = getIngrsForList(editedIngrs);
     return 'Changes were saved';
   }
-}
-
-function updateIngrsInCookedList(editable, editedIngrs) {
-  const newIngridients = getNewIngrsForList(editedIngrs);
-
-  for(let ingridient of newIngridients) {
-    Object.assign(ingridient, ingridient.nutrValues1);
-    delete ingridient.listId;
-    delete ingridient.nutrValues1;
-    delete ingridient.nutrValuesW;
-  }
-  editable.ingridients = newIngridients;
-}
-
-function getNewIngrsForList(editedIngrs) {
-  const newIngridients = new Set(editedIngrs);
-  for(let ingridient of newIngridients) {
-    if(!ingridient.nutrValuesW) {
-      newIngridients.delete(ingridient);
-    }
-  }
-  return Array.from(newIngridients);
 }
