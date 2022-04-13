@@ -177,6 +177,12 @@ export default {
     return new Promise(this.executor.bind(this));
   },
 
+  getTotalStatPeriod(fromDate, toDate) {
+    this.values = [fromDate, toDate];
+    this.queryText = 'CALL select_totalstat_period(?, ?)';
+    return new Promise(this.executor.bind(this));
+  },
+
   executor(resolve, reject) {
     db.query(this.queryText, this.values, (error, results) => {
       if(error) {

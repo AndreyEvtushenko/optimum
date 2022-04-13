@@ -162,4 +162,10 @@ export default {
     res.json(result[0]);
   },
   
+  async getTotalStatPeriod(req, res) {
+    const fromDate = req.params.from;
+    const toDate = req.params.to;
+    const result = await queries.getTotalStatPeriod(fromDate, toDate);
+    res.json(result[0]);
+  },
 }

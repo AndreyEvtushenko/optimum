@@ -4,6 +4,7 @@ import ProductForm from './components/productform.vue';
 import ProductList from './components/productlist.vue';
 import CookedList from './components/cookedlist.vue';
 import CookedForm from './components/cookedform.vue';
+import Total from './components/total.vue';
 
 export default createRouter({
   history: createWebHistory(),
@@ -20,11 +21,15 @@ export default createRouter({
       }
     },
     {
-      path: '/Cooked',
+      path: '/cooked',
       components: {
         default: CookedForm,
         CookedList
       }
+    },
+    {
+      path: '/total',
+      component: Total
     }
   ]
 });

@@ -25,5 +25,6 @@ router.patch('/api/cooked/:id', ctrl.patchCooked);
 router.patch('/api/cooked/whole/:id', ctrl.patchCookedAndIngrs);
 router.delete('/api/cooked/:id', ctrl.delCooked);
 router.get('/api/cooked/first/:count', ctrl.getFirstFromLastCooked);
+router.get('/api/totalstat/:from/:to', ctrl.getTotalStatPeriod);
 
 export default router;
