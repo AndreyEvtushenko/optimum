@@ -38,15 +38,15 @@ export default {
 
   async postEatenFood(req, res) {
     const eatenFood = req.body;
-    await queries.insertEatenFood(eatenFood);
-    res.end();
+    const result = await queries.insertEatenFood(eatenFood);
+    res.json(result.affectedRows);
   },
 
   async delEatenFood(req, res) {
     const date = req.params.date;
     const day_stat_id = req.params.day_stat_id;
-    await queries.delEatenFood(date, day_stat_id);
-    res.end();
+    const result = await queries.delEatenFood(date, day_stat_id);
+    res.json(result.affectedRows);
   },
 
   async getDayTotalStat(req, res) {
@@ -60,21 +60,21 @@ export default {
   async postDayTotalStat(req, res) {
     const dayTotalStat = req.body;
     const date = req.params.date;
-    await queries.insertDayTotalStat(dayTotalStat, date);
-    res.end();
+    const result = await queries.insertDayTotalStat(dayTotalStat, date);
+    res.json(result.affectedRows);
   },
 
   async patchDayTotalStat(req, res) {
     const dayTotalStat = req.body;
     const date = req.params.date;
-    await queries.updateDayTotalStat(dayTotalStat, date);
-    res.end();
+    const result = await queries.updateDayTotalStat(dayTotalStat, date);
+    res.json(result.affectedRows);
   },
 
   async delDayTotalStat(req, res) {
     const date = req.params.date;
-    await queries.delDayTotalStat(date);
-    res.end();
+    const result = await queries.delDayTotalStat(date);
+    res.json(result.affectedRows);
   },
 
   async postProduct(req, res) {
@@ -91,8 +91,8 @@ export default {
   async patchProduct(req, res) {
     const productId = req.params.id;
     const newValues = req.body;
-    await queries.updateProduct(newValues, productId);
-    res.end();
+    const result = await queries.updateProduct(newValues, productId);
+    res.json(result.affectedRows);
   },
 
   async delProduct(req, res) {
