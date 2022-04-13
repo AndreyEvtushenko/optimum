@@ -60,7 +60,6 @@ function convertTotalStatDate() {
   for(let index = 0; index < dates.length; index++) {
     totalStatPeriod.value[index].date = dates[index];
   }
-  console.log(totalStatPeriod.value);
 }
 </script>
 

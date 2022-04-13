@@ -20,6 +20,10 @@ const pickedFood = reactive({
   carbohydrates_1: null
 });
 
+onMounted(() => {
+  foodNameInputRef.value.focus();
+});
+
 const noMatches = computed(() => {
   if(foodMatches.value.length == 0 &&
     foodNameInput.value.length > 1 &&
@@ -27,6 +31,10 @@ const noMatches = computed(() => {
     return true;
   else
     return false;
+});
+
+const foodMatchesToShow = computed(() => {
+  return foodMatches.value.map(item => getFoodObjToShow(item));
 });
 
 const foodValuePerWeight = computed(() => {
@@ -42,10 +50,21 @@ const foodValuePerWeight = computed(() => {
   }
 });
 
-onMounted(() => {
-  foodNameInputRef.value.focus();
-});
-//handlers
+function getFoodObjToShow(item) {
+    const obj = {
+      id: item.id
+    }
+    if(item.date) {
+      const date = new Date(Date.parse(item.date)).toDateString();
+      obj.foodNameDate = `${item.name} [ ${date} ]`;
+      obj.name = item.name;
+    } else {
+      obj.foodNameDate = item.name;
+      obj.name = item.name;
+    }
+    return obj;
+}
+
 function clearFoodData() {
   if(pickedFood.id) {
     for(let value in pickedFood)
@@ -75,12 +94,12 @@ function validateWeightInput() {
 }
 
 function selectThisFood(food) {
-  pickedFood.id = food.food_id;
-  pickedFood.name = food.food_name;
-  foodNameInput.value = food.food_name;
+  pickedFood.id = food.id;
+  pickedFood.name = food.name;
+  foodNameInput.value = food.name;
   foodMatches.value = [];
   weightInputRef.value.focus();
-  getPickedFoodData(food.food_id);
+  getPickedFoodData(food.id);
   validateWeightInput();
 }
 
@@ -145,9 +164,9 @@ function clearInput() {
   </button>
   <p v-if="noMatches">No matches found</p>
   <ul v-if="foodMatches.length > 0">
-    <li v-for="food in foodMatches"
+    <li v-for="food in foodMatchesToShow"
       @click="selectThisFood(food)">
-      {{ food.food_name }}
+      {{ food.foodNameDate }}
     </li>
   </ul>
 </template>

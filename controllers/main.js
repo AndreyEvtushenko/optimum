@@ -19,7 +19,7 @@ export default {
   async getFoodMatches(req, res) {
     const substr = req.params.input;
     const matchingFood = await queries.getFoodMatches(substr);
-    res.json(matchingFood);
+    res.json(matchingFood[0]);
   },
 
   async getFoodData(req, res) {

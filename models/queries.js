@@ -6,9 +6,10 @@ export default {
 
   getFoodMatches(input) {
     this.values = ['%' + input + '%'];
-    this.queryText = 'SELECT food_id, food_name ' +
+    /* this.queryText = 'SELECT food_id, food_name, date ' +
       'FROM food ' + 
-      'WHERE food_name LIKE ?';
+      'WHERE food_name LIKE ?'; */
+    this.queryText = 'CALL select_food_matches(?)';
     return new Promise(this.executor.bind(this));
   },
 

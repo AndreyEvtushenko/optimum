@@ -53,7 +53,7 @@ const enoughDataProvided = computed(() => {
 const foodMatchesWithoutChosen = computed(() => {
   const filteredFoodMatches = [];
   for(let food of foodMatches.value) {
-    if(props.chosenIds.includes(food.food_id))
+    if(props.chosenIds.includes(food.id))
       continue;
     filteredFoodMatches.push(food);
   }
@@ -105,12 +105,12 @@ function fixWeightInputValue(event) {
 }
 
 function selectThisFood(food) {
-  emit('update:name', food.food_name);
-  emit('update:id', food.food_id);
+  emit('update:name', food.name);
+  emit('update:id', food.id);
 
   foodMatches.value = [];
   weightInputRef.value.focus();
-  getSelectedFoodData(food.food_id);
+  getSelectedFoodData(food.id);
 }
 
 async function getSelectedFoodData(id) {
@@ -139,7 +139,7 @@ async function getSelectedFoodData(id) {
   <ul v-if="foodMatches.length">
     <li v-for="food in foodMatchesWithoutChosen"
       @click="selectThisFood(food)">
-      {{ food.food_name }}
+      {{ food.name }}
     </li>
   </ul>
 </template>
