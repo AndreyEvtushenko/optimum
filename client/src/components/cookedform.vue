@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, watch, computed, onMounted } from 'vue';
+import { reactive, ref, watch, computed, onMounted, nextTick } from 'vue';
 import useStore from '../stores/cooked.js';
 import request from '../libs/requests.js';
 import { validateWeightInput } from '../libs/common.js';
@@ -36,6 +36,9 @@ watch(resultMessage, (newValue) => {
 
 onMounted(() => {
   addNewIngrToSet();
+
+  const href = document.getElementById('cook-link');
+  href.classList.add('current');
 });
 
 const ingridientsIds = computed(() => {
@@ -84,11 +87,13 @@ const cookedNutrValues100 = computed(() => {
 });
 
 watch(() => ingridients.size,
-  (newValue, oldValue) => {
+  async (newValue, oldValue) => {
     if(newValue > oldValue && newValue != 1)
       showDeleteButton.unshift(true);
     else if (newValue < oldValue)
       showDeleteButton.shift();
+
+    updateFormHeight();
 });
 
 watch(cookedNutrValues1, (newValue) => {
@@ -107,7 +112,7 @@ watch(() => store.editCookedFlag,
       return;
     }
     fillFormForEditing();
-    submitButtonText.value = 'Save changes';
+    submitButtonText.value = 'Save';
     clearButtonText.value = 'Cancel';
 });
 
@@ -148,13 +153,18 @@ function nutrValuesAreZero(nutrValues) {
   return zero;
 }
 
+async function updateFormHeight() {
+  await nextTick();
+  const form = document.querySelector('.cooked-form-background');
+  store.cookedFormHeight = form.offsetHeight;
+}
+
 function fillFormForEditing(useAsBase = false) {
   if(!useAsBase) {
     cooked.id = store.editableCooked.id;
   }  
   cooked.name = store.editableCooked.name;
   cooked.weight = store.editableCooked.weight;
-
   fillIngrsForEditing();
 }
 
@@ -290,74 +300,111 @@ function cancelOperation() {
 </script>
 
 <template>
-  <input class="name" type="text"
-    ref="cookedNameInputRef"
-    placeholder="cooked thing name"
-    maxlength="64"
-    v-model="cooked.name">
-  <input class="weight" type="text"
-    placeholder="cooked weight"
-    maxlength="4"
-    @input="cooked.weight = validateWeightInput($event)"
-    v-model="cooked.weight">
-  <p>Ingridients:</p>
-  <div class="ingridients">
-    <div class="header">
-      <span class="indent"></span>
-      <span v-for="value in pseudos">{{ value }}</span>
+  <div class="cooked-form-background">
+  <div class="cooked-form">
+    <input class="name" type="text"
+      ref="cookedNameInputRef"
+      placeholder="cooked thing name"
+      maxlength="64"
+      v-model="cooked.name">
+    <input class="weight" type="text"
+      placeholder="weight"
+      maxlength="4"
+      @input="cooked.weight = validateWeightInput($event)"
+      v-model="cooked.weight">
+    <p class="header">Ingridients:</p>
+    <div class="ingridients">
+      <div class="header">
+        <span class="indent"></span>
+        <span v-for="value in pseudos">{{ value }}</span>
+      </div>
+      <div class="ingridient"
+        v-for="(ingridient, index) in ingridients"
+        :key="ingridient.listId">
+        <IngridientForm
+          :chosenIds="ingridientsIds"
+          v-model:id="ingridient.id"
+          v-model:name="ingridient.name"
+          v-model:weight="ingridient.weight"
+          v-model:nutrValues1="ingridient.nutrValues1"
+          v-model:nutrValuesW="ingridient.nutrValuesW"
+          @ingridientIsFull="addNewForm"
+          @ingridientIsEmptied="delIngridient(ingridient)" />
+        <button v-if="showDeleteButton[index] || ingridient.id"
+          @click="delIngridient(ingridient)">
+          Delete
+        </button>
+      </div>
     </div>
-    <div v-for="(ingridient, index) in ingridients"
-      :key="ingridient.listId">
-      <IngridientForm
-        :chosenIds="ingridientsIds"
-        v-model:id="ingridient.id"
-        v-model:name="ingridient.name"
-        v-model:weight="ingridient.weight"
-        v-model:nutrValues1="ingridient.nutrValues1"
-        v-model:nutrValuesW="ingridient.nutrValuesW"
-        @ingridientIsFull="addNewForm"
-        @ingridientIsEmptied="delIngridient(ingridient)"
-      />
-      <button v-if="showDeleteButton[index] || ingridient.id"
-        @click="delIngridient(ingridient)">
-        Delete
+    <div class="ingridients-total">
+      <hr>
+      <span class="indent">Nutritional value (per 100g):</span>
+      <span v-for="value in cookedNutrValues100">
+        {{ value }}
+      </span>
+    </div>
+    <div class="form-buttons">
+      <button @click="submitCooked">
+        {{ submitButtonText }}
       </button>
-    </div>
+      <button @click="cancelOperation">
+        {{ clearButtonText }}
+      </button>
+    </div>    
+    <p class="result-message">
+      {{ resultMessage }}
+    </p>    
   </div>
   <hr>
-  <span class="indent">Nutritional value (per 100g):</span>
-  <span v-for="value in cookedNutrValues100">
-    {{ value }}
-  </span>
-  <button @click="submitCooked">
-    {{ submitButtonText }}
-  </button>
-  <button @click="cancelOperation">
-    {{ clearButtonText }}
-  </button>
-  <p class="result-message">
-    {{ resultMessage }}
-  </p>
-  <hr>
+  </div>
 </template>
 
 <style>
-  input.name {
-    width: 400px;
-    margin: 5px;
+  .cooked-form-background {
+    width: 980px;
+    position: fixed;
+    top: 62px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: white;
+    /* cooked list settings and header overlap food matches */
+    z-index: 1;
   }
-  input.weight {
-    width: 90px;
-    margin: 5px;
+  .cooked-form {    
+    width: 835px;
+    padding-top: 8px;
+    margin: 0 auto;    
   }
-  span {
-    display: inline-block;
+  p.header {
+    font-size: 16px;
+    margin-top: 13px;
+    margin-bottom: 0px;
+  }
+  .cooked-form span {
     width: 60px;
   }
-  .indent {
-    width: 525px;
+  .cooked-form .name {
+    margin-left: 5px;
   }
-  ul {
-    list-style-type: none;
+  .cooked-form .matches {
+    margin-left: 5px;
+  }
+  .ingridients span.indent, .ingridients-total span.indent {
+    width: 528px;
+    padding-left: 5px;
+  }
+  .ingridient {
+    margin-top: 5px;
+  }
+  .ingridient button {
+    height: 34px;
+    width: 60px;
+    font-size: 14px;
+  }
+  .ingridients-total hr {
+    border: 1px solid rgb(218, 221, 217);
+  }
+  .ingridients-total span {
+    font-size: 15px;
   }
 </style>

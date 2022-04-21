@@ -21,6 +21,9 @@ const resultMessage = ref('');
 
 onMounted(() => {
   productNameInputRef.value.focus();
+
+  const href = document.getElementById('prod-link');
+  href.classList.add('current');
 });
 
 watch(() => resultMessage.value, 
@@ -37,7 +40,7 @@ watch(() => store.editProductFlag,
       return;
     }
     fillInputsForEdit();
-    submitButtonText.value = 'Save changes';
+    submitButtonText.value = 'Save';
     clearButtonText.value = 'Cancel';
 });
 
@@ -257,43 +260,63 @@ function cancelOperation() {
 </script>
 
 <template>
-  <input class="product-name" type="text"
-    ref="productNameInputRef"
-    placeholder="product name"
-    maxlength="64"
-    v-model="productNameInput">
-  <div class="energy-value-input"
-    v-for="(value, key, index) in nutrValueInputs">
-    <p>{{ pseudos[index] }}:</p>
-    <input type="text"
+  <div class="product-form">
+    <div class="header">
+      <span class="indent"></span>
+      <span class="nutr-value-header" 
+        v-for="item in pseudos">
+        {{ item }}
+      </span>
+    </div>
+    <input class="name" type="text"
+      ref="productNameInputRef"
+      placeholder="product name"
+      maxlength="64"
+      v-model="productNameInput">
+    <input class="nutr-value-input" type="text"
+      v-for="(value, key) in nutrValueInputs"
       @input="validateNutrInput(key, value)"
       v-model="nutrValueInputs[key]">
+    <div class="form-buttons">
+      <button @click="submitProduct">
+        {{ submitButtonText }}
+      </button>
+      <button @click="cancelOperation">
+        {{ clearButtonText }}
+      </button>
+    </div>
+    <p class="result-message">
+      {{ resultMessage }}
+    </p>
+    <hr>
   </div>
-  <button @click="submitProduct">
-    {{ submitButtonText }}
-  </button>
-  <button @click="cancelOperation">
-    {{ clearButtonText }}
-  </button>
-  <p class="result-message">
-    {{ resultMessage }}
-  </p>
-  <hr>
 </template>
 
 <style>
-  input.product-name {
-    width: 400px;
-    margin: 5px;
+  .product-form {
+    width: 800px;
+    position: fixed;
+    top: 62px;
+    padding-top: 8px;
+    padding-left: 26px;
+    padding-right: 26px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: white;
   }
-  .energy-value-input p {
-    display: inline-block;
-    width: 50px;
-    margin: 5px;
+  .product-form .indent {
+    width: 425px;
+    margin-left: 30px;
   }
-  .energy-value-input input {
-    width: 50px;
+  .nutr-value-header {
+    width: 79px;
   }
+  .product-form .name {
+    margin-left: 30px;
+  }
+  .nutr-value-input {
+    width: 60px;
+  }  
   .result-message {
     height: 20px;
   }

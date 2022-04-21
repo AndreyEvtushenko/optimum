@@ -7,9 +7,9 @@ const store = useStore();
 
 const foodNameInputRef = ref(null);
 const weightInputRef = ref(null);
-let foodNameInput = ref('');
-let weightInput = ref('');
-let foodMatches = ref([]);
+const foodNameInput = ref('');
+const weightInput = ref('');
+const foodMatches = ref([]);
 const pickedFood = reactive({
   id: null,
   name: null,
@@ -19,9 +19,13 @@ const pickedFood = reactive({
   fats_1: null,
   carbohydrates_1: null
 });
+const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
 
 onMounted(() => {
   foodNameInputRef.value.focus();
+
+  const href = document.getElementById('main-link');
+  href.classList.add('current');
 });
 
 const noMatches = computed(() => {
@@ -38,16 +42,13 @@ const foodMatchesToShow = computed(() => {
 });
 
 const foodValuePerWeight = computed(() => {
-  return {
-    kcal: +(pickedFood.kcal_1 * pickedFood.weight)
-      .toFixed(2),
-    proteins: +(pickedFood.proteins_1 * pickedFood.weight)
-      .toFixed(2),
-    fats: +(pickedFood.fats_1 * pickedFood.weight)
-      .toFixed(2),
-    carbohydrates: +(pickedFood.carbohydrates_1 * pickedFood.weight)
-      .toFixed(2),
-  }
+  if(!enoughDataProvided.value)
+    return ['-', '-', '-', '-'];
+  return getNutrValusToShow();
+});
+
+const enoughDataProvided = computed(() => {
+  return pickedFood.id && pickedFood.weight > 0 ? true : false;
 });
 
 function getFoodObjToShow(item) {
@@ -63,6 +64,19 @@ function getFoodObjToShow(item) {
       obj.name = item.name;
     }
     return obj;
+}
+
+function getNutrValusToShow() {
+  return {
+    kcal: +(pickedFood.kcal_1 * pickedFood.weight)
+      .toFixed(2),
+    proteins: +(pickedFood.proteins_1 * pickedFood.weight)
+      .toFixed(2),
+    fats: +(pickedFood.fats_1 * pickedFood.weight)
+      .toFixed(2),
+    carbohydrates: +(pickedFood.carbohydrates_1 * pickedFood.weight)
+      .toFixed(2),
+  }
 }
 
 function clearFoodData() {
@@ -146,30 +160,72 @@ function clearInput() {
 </script>
 
 <template>
-  <input type="text"
-    ref="foodNameInputRef"
-    placeholder="food name"
-    @input="clearFoodData(), getFoodMatches()"
-    v-model="foodNameInput">
-  <input type="text"
-    ref="weightInputRef"
-    placeholder="food weight"
-    @input="validateWeightInput"
-    v-model="weightInput">
-  <p v-for="(value, key) in foodValuePerWeight">
-    {{ key }}: {{ value }}
-  </p>
-  <button @click="submitSpecifiedFood">
-    Submit
-  </button>
-  <p v-if="noMatches">No matches found</p>
-  <ul v-if="foodMatches.length > 0">
-    <li v-for="food in foodMatchesToShow"
-      @click="selectThisFood(food)">
-      {{ food.foodNameDate }}
-    </li>
-  </ul>
+  <div class="food-form">
+    <div class="header">
+      <span class="indent"></span>
+      <span v-for="item in pseudos">{{ item }}</span>
+    </div>   
+    <input class="name" type="text"
+      ref="foodNameInputRef"
+      placeholder="food name"
+      maxlength="64"
+      @input="clearFoodData(), getFoodMatches()"
+      v-model="foodNameInput">
+    <input class="weight" type="text"
+      ref="weightInputRef"
+      placeholder="food weight"
+      maxlength="4"
+      @input="validateWeightInput"
+      v-model="weightInput">
+    <span v-for="value in foodValuePerWeight">
+      {{ value }}
+    </span>
+    <p v-if="noMatches">No matches found</p>
+    <ul class="matches" v-if="foodMatches.length > 0">
+      <li v-for="food in foodMatchesToShow"
+        @click="selectThisFood(food)">
+        {{ food.foodNameDate }}
+      </li>
+    </ul>
+    <div class="form-buttons">
+      <button @click="submitSpecifiedFood">
+        Submit
+      </button>
+    </div>
+  </div>
 </template>
 
 <style>
+  .food-form {
+    width: 770px;
+    position: fixed;
+    top: 112px;    
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: white;
+    /* otherwise food-form overlaps date-picker */
+    z-index: 0;
+  }
+  .matches {
+    padding-left: 0;
+    margin-top: -2px;
+    border: 2px solid rgb(218, 221, 217);
+    background-color: white;
+    cursor: pointer;
+    width: 500px;
+    position: absolute;
+  }  
+  .matches li {
+    margin: 1px;
+    padding: 2px;
+  }
+  .matches li:hover {
+    background-color: rgb(209, 238, 207);
+  }
+  .food-form span {
+    width: 60px;
+  }
+  .food-form span.indent {
+    width: 528px;
+  }
 </style>

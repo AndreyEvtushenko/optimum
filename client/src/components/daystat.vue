@@ -10,6 +10,7 @@ const dayTotalStat = reactive({
   fats: 0,
   carbohydrates: 0
 });
+const pseudos = ['Weight', 'Kcal', 'Prots', 'Fats', 'Carbs'];
 let foodDeletedFlag = false;
 
 watch(
@@ -105,21 +106,17 @@ function subFromTotalStat(deletedFood) {
 </script>
 
 <template>
-  <p v-if="!store.dayStat.length">
+  <p class="day-stat" v-if="!store.dayStat.length">
     No eaten food on this date
   </p>
-  <div v-if="store.dayStat.length">
-    <div class="foodOnDate">
-      <span class="firstColumn"></span>
-      <span>Weight</span>
-      <span>Kcal</span>
-      <span>Prots.</span>
-      <span>Fats</span>
-      <span>Carbs.</span>
+  <div class="day-stat" v-if="store.dayStat.length">
+    <div class="header">
+      <span class="indent"></span>
+      <span v-for="item in pseudos">{{ item }}</span>
     </div>
-    <div class="foodOnDate"
+    <div class="food-item"
       v-for="food in store.dayStat">
-      <span class="firstColumn">{{ food.name }}</span>
+      <span class="food-name">{{ food.name }}</span>
       <span>{{ food.weight }}</span>
       <span>{{ food.kcal }}</span>
       <span>{{ food.proteins }}</span>
@@ -127,8 +124,8 @@ function subFromTotalStat(deletedFood) {
       <span>{{ food.carbohydrates }}</span>
       <button @click="delEatenFood(food)">Delete</button>
     </div>
-    <div class="totalStat">
-      <hr>
+    <hr>
+    <div class="total-stat">      
       <span class="header">Total:</span>
       <span class="value" v-for="value in dayTotalStat">
         {{ value }}
@@ -138,14 +135,34 @@ function subFromTotalStat(deletedFood) {
 </template>
 
 <style>
-  .foodOnDate span, .totalStat span {
-    display: inline-block;
+  .day-stat {
+    margin-top: 10px;
+    padding-left: 20px;
+    width: 800px;
+    margin: 0 auto;
+    margin-top: 226px;
+    margin-bottom: 65px;
+  }
+  .day-stat span {
     width: 60px;
   }
-  .foodOnDate .firstColumn {
-    width: 400px;
+  .day-stat span.indent, .day-stat span.food-name {
+    width: 440px;
   }
-  .totalStat .header {
-    width: 460px;
+  .day-stat .header {
+    margin-bottom: 7px;
+    font-weight: bold;
+  }
+  .food-item {
+    margin: 2px;
+  }
+  .food-item span {
+    font-size: 15px;
+  }
+  .total-stat span {
+    font-size: 16px;
+  }
+  .total-stat .header {
+    width: 500px;
   }
 </style>

@@ -12,6 +12,9 @@ const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
 onMounted(() => {
   adjustFromDate();
   getTotalStat();
+
+  const href = document.getElementById('tot-link');
+  href.classList.add('current');
 });
 
 watch(fromDate, (newValue) => {
@@ -65,20 +68,27 @@ function convertTotalStatDate() {
 
 <template>
   <div class="date-interval">
-    <span>From: </span>
-    <Datepicker v-model="fromDate"
-      input-format="yyyy MMM dd"></Datepicker>
-    <span>To: </span>
-    <Datepicker v-model="toDate"
-      input-format="yyyy MMM dd"></Datepicker>
+    <span class="interval-label">From: </span>
+    <div class="from">      
+      <Datepicker v-model="fromDate"
+        input-format="yyyy MMM dd"></Datepicker>
+    </div>
+    <span class="interval-label">To: </span>
+    <div class="to">      
+      <Datepicker v-model="toDate"
+        input-format="yyyy MMM dd"></Datepicker>
+    </div>    
   </div>
-  <p v-if="noTotalStat">
+  <p class="no-total-stat" v-if="noTotalStat">
     No data on this period
   </p>
   <div class="total-stat-list" v-else>
-    <span class="date">Date</span>
-    <span v-for="item in pseudos"> {{ item }}</span>
-    <div v-for="stat in totalStatPeriod">
+    <div class="header">
+      <span class="date">Date</span>
+      <span v-for="item in pseudos"> {{ item }}</span>
+    </div>
+    <div class="total-stat-item"
+      v-for="stat in totalStatPeriod">
       <span class="date">{{ stat.date }}</span>
       <span>{{ stat.kcal }}</span>
       <span>{{ stat.proteins }}</span>
@@ -86,17 +96,58 @@ function convertTotalStatDate() {
       <span>{{ stat.carbohydrates }}</span>
     </div>
   </div>
-
 </template>
 
 <style>
-  .date-interval span {
-    width: 20px;
+  .date-interval .from, .date-interval .to {
+    display: inline-block;
+    width: 350px;
+    margin-bottom: 5px;
   }
-  span.date {
-    width: 130px;
+  .date-interval {
+    width: 400px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 20px;
+    position: fixed;
+    top: 62px;
+    background-color: white;
+    z-index: 1;
+  }
+  span.interval-label {
+    width: 40px;
+    margin-right: 5px;
+    text-align: right;
+  }
+  .no-total-stat {
+    padding-left: 20px;
+    position: fixed;
+    top: 156px; 
+  }
+  .total-stat-list {
+    margin-top: 180px;
+    margin-bottom: 65px;
+    padding-left: 20px;
+    z-index: 0;
   }
   .total-stat-list span {
-    margin: 5px;
+    font-size: 15px;
+    width: 70px;
   }
+  .total-stat-list .header {
+    position: fixed;
+    top: 156px;
+    padding-bottom: 5px;
+    background-color: white;
+  }
+  .total-stat-list .header span{
+    font-size: 16px;
+    font-weight: bold;
+  }
+  span.date {
+    width: 135px;
+  }
+  .total-stat-item {
+    margin-top: 5px;
+  }  
 </style>

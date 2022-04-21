@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Main from './components/main.vue';
+import DatePicker from './components/datepicker.vue';
+import FoodWeight from './components/food&weight.vue';
+import DayStat from './components/daystat.vue';
 import ProductForm from './components/productform.vue';
 import ProductList from './components/productlist.vue';
 import CookedList from './components/cookedlist.vue';
@@ -11,7 +13,11 @@ export default createRouter({
   routes: [
     {
       path: '/',
-      component: Main
+      components: {
+        default: FoodWeight,
+        DatePicker,
+        DayStat
+      }
     },
     {
       path: '/products',

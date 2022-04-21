@@ -7,6 +7,7 @@ const store = useStore();
 const showButtonText = ref('Show products');
 const productFilterInputRef = ref(null);
 const resultMessage = ref('');
+const pseudos = ['Kcal', 'Prots', 'Fats', 'Carbs'];
 
 const productListIsEmpty = computed(() => {
   if(store.products.length)
@@ -61,11 +62,13 @@ async function getProducts() {
 }
 
 function scrollToBottom() {
-  const list = document.getElementById('list-elem');
+  /* const list = document.getElementById('list-elem');
   if(list) {
     const scrollHeight = list.scrollHeight;
     list.scrollTop = scrollHeight;
-  }
+  } */
+  const scrollHeight = document.body.scrollHeight;
+  scrollTo(0, scrollHeight);
 }
 
 function makeNutrValuesPer100(products) {
@@ -74,7 +77,7 @@ function makeNutrValuesPer100(products) {
       if(key == 'id' || key == 'name')
         continue;
       const newKey = key.replace('_1', '');
-      product[newKey] = (product[key] * 100).toFixed(2);
+      product[newKey] = +(product[key] * 100).toFixed(2);
       delete product[key];
     }
   }
@@ -110,12 +113,14 @@ function deleteFromList(deletedProduct) {
 </script>
 
 <template>
-  <button @click="getProducts">
-    {{ showButtonText }}
-  </button>
-  <button @click="scrollToBottom">
-    Scroll to bottom
-  </button>
+  <div class="product-list-buttons">
+    <button @click="getProducts">
+      {{ showButtonText }}
+    </button>
+    <button @click="scrollToBottom">
+      Scroll to bottom
+    </button>
+  </div>  
   <p v-if="productListIsEmpty">
     {{ resultMessage }}
   </p>
@@ -127,15 +132,15 @@ function deleteFromList(deletedProduct) {
           placeholder="filter..."
           v-model="store.productFilter">
       </span>
-      <span>Kcal</span>
-      <span>Prots.</span>
-      <span>Fats</span>
-      <span>Carbs.</span>
+      <span class="nutr-value-header" 
+        v-for="item in pseudos">
+        {{ item }}
+      </span>
     </div>
     <p v-if="filteredProductsListIsEmpty">
       No such products
     </p>
-    <div id="list-elem" class="list" v-else>
+    <div class="list" v-else>
       <div class="product"
         v-for="product in store.filteredProducts"
         :key="product.food_id">
@@ -158,27 +163,56 @@ function deleteFromList(deletedProduct) {
 </template>
 
 <style>
+  .product-list-buttons {
+    position: fixed;
+    top: 235px;
+    width: 800px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    background-color: white;
+  }
+  .product-list-buttons button {
+    height: 30px;
+    width: 130px;
+    margin-right: 5px;
+  }
   .products {
-    margin: 10px;
+    width: 800px;
+    /* padding-top: 10px; */
+    margin: 0 auto;
+    padding-left: 20px;
+    margin-bottom: 65px;
   }
   .products span {
-    display: inline-block;
     width: 60px;
   }
   .products .header {
-    padding: 5px 0;
-  }
-  span.product-name {
-    width: 450px;
-  }
-  .product-name .filter {
-    width: 430px;
+    position: fixed;
+    top: 285px;
+    width: 800px;
+    padding-top: 5px;
+    padding-bottom: 7px;
+    background-color: white;
   }
   .products .list {
-    height: 550px;
-    overflow-x: auto;
+    margin-top: 330px;
   }
-  .list .product {
-    padding: 3px 0;
+  .products .header span {
+    font-weight: bold;
+  }
+  span.product-name {
+    width: 440px;
+  }
+  .product-name .filter {
+    width: 420px;
+  }
+  .products .product {
+    margin-top: 3px;
+  }
+  .list button {
+    margin-right: 2px;
   }
 </style>

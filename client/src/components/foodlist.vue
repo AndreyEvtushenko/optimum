@@ -24,7 +24,7 @@ const foodListPerWeight = computed(() => {
 
 <template>
   <div class="food-list">
-    <div class="header">
+    <div class="food-list-header">
       <span class="food-name"></span>
       <span v-for="value in pseudos">{{ value }}</span>
     </div>
@@ -42,10 +42,19 @@ const foodListPerWeight = computed(() => {
 
 <style>
   .food-list {
-    margin: 10px;
-    background-color: aqua;
+    width: 750px;
+    margin-top: 3px;
+    margin-left: 10px;
+    padding-left: 5px;
+    border-left: 2px solid rgb(218, 221, 217);
+    border-bottom: 2px solid rgb(218, 221, 217);
+    border-right: 2px solid rgb(218, 221, 217);
   }
-  span.food-name {
+  .food-list .food-list-header span {
+    font-size: 15px;
+    font-weight: bold;
+  }
+  .food-list span.food-name {
     width: 440px;
   }
 </style>

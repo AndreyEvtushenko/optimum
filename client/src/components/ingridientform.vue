@@ -136,7 +136,7 @@ async function getSelectedFoodData(id) {
   <span v-for="value in nutrValuesPerWeight">
     {{ value }}
   </span>
-  <ul v-if="foodMatches.length">
+  <ul class="matches" v-if="foodMatches.length">
     <li v-for="food in foodMatchesWithoutChosen"
       @click="selectThisFood(food)">
       {{ food.name }}
