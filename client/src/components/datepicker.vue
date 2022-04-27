@@ -2,7 +2,7 @@
 import { onMounted, watch } from 'vue';
 import Datepicker from 'vue3-datepicker';
 import request from '../libs/requests.js';
-import useStore from '../stores/store.js';
+import useStore from '../stores/food.js';
 
 const store = useStore();
 

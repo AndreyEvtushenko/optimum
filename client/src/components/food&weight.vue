@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, reactive } from 'vue';
 import request from '../libs/requests.js';
-import useStore from '../stores/store.js';
+import useStore from '../stores/food.js';
 
 const store = useStore();
 

@@ -1,5 +1,5 @@
 import express from 'express';
-//import { connection } from './models/bd_connect.js';
+//import { connection } from './models/db_connect.js';
 import mainRouter from './routes/main.js';
 //import availFoodRouter from './routes/availFood.js';
 

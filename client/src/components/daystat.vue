@@ -1,6 +1,6 @@
 <script setup>
 import { watch, reactive } from 'vue';
-import useStore from '../stores/store.js';
+import useStore from '../stores/food.js';
 import request from '../libs/requests.js';
 
 const store = useStore();
