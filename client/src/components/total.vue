@@ -21,12 +21,14 @@ watch(fromDate, (newValue) => {
   if(newValue > toDate.value) {
     fromDate.value = toDate.value;
   }
+  getTotalStat();
 });
 
 watch(toDate, (newValue) => {
   if(newValue < fromDate.value) {
     fromDate.value = toDate.value;
   }
+  getTotalStat();
 });
 
 function adjustFromDate() {

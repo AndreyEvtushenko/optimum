@@ -99,6 +99,7 @@ function showCookedMatches(event) {
 async function getCookedMatches(filter) {
   const URL = `/api/cooked/matches/${filter}`;
   store.cookedList = await request.get(URL);
+  checkRetrievedCookedList();
 }
 
 async function getIngridients(cooked) {
@@ -183,7 +184,7 @@ async function useAsBase(cooked) {
       maxlength=64
       @input="showCookedMatches($event)">
   </div>
-  <p v-if="cookedListIsEmpty">
+  <p class="cooked-search-result" v-if="cookedListIsEmpty">
     {{ resultMessage }}
   </p>
   <div class="cooked-list" v-else>
@@ -245,6 +246,9 @@ async function useAsBase(cooked) {
   }
   .cooked-list-settings span {
     width: 25px;
+  }
+  .cooked-search-result {
+    margin-top: 400px;
   }
   .cooked-list .header {
     position: fixed;

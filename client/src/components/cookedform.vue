@@ -39,6 +39,9 @@ onMounted(() => {
 
   const href = document.getElementById('cook-link');
   href.classList.add('current');
+
+  store.editCookedFlag = false;
+  store.baseCookedFlag = false;
 });
 
 const ingridientsIds = computed(() => {

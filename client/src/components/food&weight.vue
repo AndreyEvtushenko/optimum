@@ -117,29 +117,33 @@ function selectThisFood(food) {
   validateWeightInput();
 }
 
-function submitSpecifiedFood() {
-  sendEatenFood();
-  addFoodToDayStat();
-  
-  clearFoodData();
-  clearInput();
-
-  foodNameInputRef.value.focus();
-}
-
 async function getPickedFoodData(id) {
   const data = await request.get(`/api/food/data/${id}`);
   Object.assign(pickedFood, data);
 }
 
-function sendEatenFood() {
+async function submitSpecifiedFood() {
+  if(!enoughDataProvided.value)
+    return;
+  const sendResult = await sendEatenFood();
+  if(!sendResult)
+    return;
+
+  addFoodToDayStat();  
+  clearFoodData();
+  clearInput();
+  foodNameInputRef.value.focus();
+}
+
+async function sendEatenFood() {
   const eatenFood = {
     date: store.pickedDateString,
     dayStatId: store.getDayStatId,
     foodId: pickedFood.id,
     weight: pickedFood.weight
   }
-  request.post('/api/daystat', eatenFood);
+  const result = await request.post('/api/daystat', eatenFood);
+  return result;
 }
 
 function addFoodToDayStat() {
@@ -180,7 +184,7 @@ function clearInput() {
     <span v-for="value in foodValuePerWeight">
       {{ value }}
     </span>
-    <p v-if="noMatches">No matches found</p>
+    <p class="matches" v-if="noMatches">No matches found</p>
     <ul class="matches" v-if="foodMatches.length > 0">
       <li v-for="food in foodMatchesToShow"
         @click="selectThisFood(food)">

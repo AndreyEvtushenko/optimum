@@ -24,6 +24,8 @@ onMounted(() => {
 
   const href = document.getElementById('prod-link');
   href.classList.add('current');
+
+  store.editProductFlag = false;
 });
 
 watch(() => resultMessage.value, 
@@ -47,6 +49,7 @@ watch(() => store.editProductFlag,
 const product = computed(() => {
   const obj = {
     name: productNameInput.value,
+    date: new Date().toDateString()
   }
   for(let key in nutrValueInputs) {
     obj[key + '_1'] = nutrValueInputs[key] / 100;

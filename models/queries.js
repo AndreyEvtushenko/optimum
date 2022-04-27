@@ -94,11 +94,13 @@ export default {
     this.queryText = 'INSERT INTO food ' +
       'SET ' +
       'food_name = ?, ' +
+      'date = str_to_date(?, "%W %M %d %Y"), ' +
       'is_dish = 0, ' +
       'kcal_1 = ?, ' +
       'proteins_1 = ?, ' +
       'fats_1 = ?, ' +
-      'carbohydrates_1 = ?'
+      'carbohydrates_1 = ?, ' +
+      'added_by_user = 1';
     return new Promise(this.executor.bind(this));
   },
 

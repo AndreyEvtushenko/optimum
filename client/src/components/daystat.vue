@@ -13,8 +13,7 @@ const dayTotalStat = reactive({
 const pseudos = ['Weight', 'Kcal', 'Prots', 'Fats', 'Carbs'];
 let foodDeletedFlag = false;
 
-watch(
-  () => store.foodAddedFlag,
+watch(() => store.foodAddedFlag,
   (newValue) => {
     if(!newValue) return;
     const date = store.pickedDateString;
@@ -27,8 +26,7 @@ watch(
   }
 );
 
-watch(
-  () => store.pickedDateString,
+watch(() => store.pickedDateString,
   (newDate, oldDate) => {
     if(newDate != oldDate) {
       clearTotalDayStat();
@@ -36,8 +34,7 @@ watch(
   }
 );
 
-watch(
-  () => store.dayStat, async () => {
+watch(() => store.dayStat, async () => {
     if(store.dayStat.length && !foodDeletedFlag) {
       await getDayTotalStat();
     } else
@@ -55,18 +52,25 @@ async function getDayTotalStat() {
   }
   else return false;
 }
-
-function delEatenFood(food) {
+// TODO: it should be a transaction
+async function delEatenFood(food) {
   const date = store.pickedDateString;
   const dayStatId = food.dayStatId;
-  const URL = `/api/daystat/${date}/${dayStatId}`;
-  request.delete(URL);
+
+  const result = await delEatenFoodRequest(date, dayStatId);
+  if(result == 0)
+    return;
   delFromDayStat(dayStatId);
   subFromTotalStat(food);
   if(store.dayStat.length)
     request.patch(`/api/totalstat/${date}`, dayTotalStat);
   else
     request.delete(`/api/totalstat/${date}`);
+}
+
+function delEatenFoodRequest(date, dayStatId) {  
+  const URL = `/api/daystat/${date}/${dayStatId}`;
+  return request.delete(URL);
 }
 
 function delFromDayStat(dayStatId) {
