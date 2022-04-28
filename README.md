@@ -25,7 +25,7 @@ There are four pages:
 ![total page](https://user-images.githubusercontent.com/23217839/165700683-2b1fffe1-00d7-4abd-a622-52aa8b48d775.gif)
 
 # How to run this app
-Set up database using backups from database_backup folder
+Set up database using backups from database_backup folder  
 In the client folder and in the project root folder run this command:
 
 ```
