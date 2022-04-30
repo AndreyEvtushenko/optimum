@@ -1,32 +1,19 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Main page</title>
-</head>
-<body>
-  <div id="vueFoodWeight">
-    <h1>Specify food & weight</h1>
-    <input type="text" ref="nameInput"
-      placeholder="food name"
-      @input="getMatchingFood(), clearFoodData()"
-      v-model="nameInput">
-    <input type="text" ref="weightInput"
-      placeholder="food weight"
-      @input="validateWeightInput"
-      v-model="weightInput">
-    <p v-for="(value, key) in nutrientsPerWeight">
-      {{ key }}: {{ value }}
-    </p>
-    <p v-if="noMatches">No matches found</p>
-    <ul v-if="availFood.length > 0">
-      <li v-for="food in availFood"
-        @click="selectThisFood(food)">
-        {{ food.food_name }}
-      </li>
-    </ul>
-  </div>
-  <script src="https://unpkg.com/vue@3"></script>
-  <script src="food&weight.js"></script>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Optimum</title>
+    <script type="module" crossorigin src="/assets/index.f6453254.js"></script>
+    <link rel="modulepreload" href="/assets/vendor.dc90c88f.js">
+    <link rel="stylesheet" href="/assets/index.b23e25bc.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    
+  </body>
 </html>

@@ -1,5 +1,7 @@
 export default {
-  baseURL: 'http://localhost:8080',
+  // for dev
+  // baseURL: 'http://localhost:8080',
+  baseURL: '',
   options: {
     method: '',
     headers: {
