@@ -38,7 +38,7 @@ localhost:3000
 ```
 
 # Plans for future
-Mobile version
+Mobile version  
 Authentification  
 Multi-user system implementation  
 Proper error-handling  
