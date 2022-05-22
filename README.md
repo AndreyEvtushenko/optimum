@@ -1,6 +1,9 @@
 # Optimum
 It's a pet-project web-app that is designed to help manage consumed food nutritional value
 
+# Demo
+[Optimum demo page](http://185.251.91.244/)
+
 # Technologies
 Stack: Vue 3 + Express + MySQL  
 Frontend: Vue 3 Composition API, Pinia 2, Vue Router 4, Vite 2.8  
