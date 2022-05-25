@@ -13,7 +13,7 @@ export default {
         }
     };
 
-    res.sendFile('/views/index.html', options);
+    res.sendFile('./views/index.html', options);
   },
 
   async getFoodMatches(req, res) {
