@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Main page</title>
+</head>
+<body>
+  <div id="vueFoodWeight">
+    <h1>Specify food & weight</h1>
+    <input type="text" ref="nameInput"
+      placeholder="food name"
+      @input="getMatchingFood(), clearFoodData()"
+      v-model="nameInput">
+    <input type="text" ref="weightInput"
+      placeholder="food weight"
+      @input="validateWeightInput"
+      v-model="weightInput">
+    <p v-for="(value, key) in nutrientsPerWeight">
+      {{ key }}: {{ value }}
+    </p>
+    <p v-if="noMatches">No matches found</p>
+    <ul v-if="availFood.length > 0">
+      <li v-for="food in availFood"
+        @click="selectThisFood(food)">
+        {{ food.food_name }}
+      </li>
+    </ul>
+  </div>
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="food&weight.js"></script>
+</body>
+</html>
