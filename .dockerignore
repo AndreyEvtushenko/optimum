@@ -1,0 +1,7 @@
+.git
+.gitignore
+github_gifs
+node_modules
+database
+docker-compose.yml
+features.txt

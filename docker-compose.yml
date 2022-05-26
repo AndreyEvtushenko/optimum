@@ -1,0 +1,8 @@
+services:
+  db:
+    image: omnistrom/optimum_db
+  app:
+    image: omnistrom/optimum_app
+    ports:
+      - "80:80"
+  
